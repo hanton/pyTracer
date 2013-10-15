@@ -5,7 +5,7 @@ class Color:
         self.r, self.g, self.b = red, green, blue
    
     def __str__(self):
-        return "(%s,%s,%s)" % (self.x, self.y, self.z)
+        return "(%s,%s,%s)" % (self.r, self.g, self.b)
 
     def __repr__(self): 
         return "Color" + str(self)
@@ -77,8 +77,9 @@ class Vector(object):
     def length(self):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
-    def normalized(self): 
-        return self.scalar(1.0 / length(self))
+    def normalize(self): 
+        length = self.length()
+        return self.scalar(1.0 / length)
 
 
 class Ray:
