@@ -11,7 +11,7 @@ class RayCast:
         shading_point = self.scene.hit_objects(ray_origin, ray_direction)
          
         if(shading_point.hit_an_object):
-            print "hit"
+            #print "hit"
             #shading_point.ray = ray
             return shading_point.material.shade(shading_point)
         else:

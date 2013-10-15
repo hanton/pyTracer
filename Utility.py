@@ -78,8 +78,8 @@ class Vector(object):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     def normalize(self): 
-        length = self.length()
-        return self.scalar(1.0 / length)
+        length = math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
+        return self.scalar(1.0 / self.length())
 
 
 class Ray:

@@ -14,11 +14,8 @@ class Matte(Material):
         #wo = -shading_point.ray.direction
         L = Color(0, 0, 0)
         for light in shading_point.scene.lights:
-            wi = light.get_direction()
-            print shading_point.normal
+            wi = light.get_direction().scalar(-1.0)
             ndotwi = shading_point.normal.dot(wi)
-            ndotwi = - ndotwi
-            #print ndotwi
             if ndotwi > 0.0:
                 L += self.diffuse_brdf.f() * light.L().scalar(ndotwi)
 

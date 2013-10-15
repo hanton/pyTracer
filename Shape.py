@@ -19,7 +19,7 @@ class Sphere:
         b = 2.0 * temp.dot(ray.direction)
         c = temp.dot(temp) - self.radius * self.radius
         discriminant = b * b - 4.0 * a * c
-
+        
         if discriminant < 0.0:
             return False
         else:

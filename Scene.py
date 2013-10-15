@@ -40,7 +40,7 @@ class Scene:
         matte = Matte(kd, blue)
 
         center = Point(0, 0, -10)
-        radius = 10.0
+        radius = 100.0
         sphere = Sphere(center, radius, matte)
         self.add_shape(sphere)
         
