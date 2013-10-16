@@ -33,9 +33,15 @@ class PinholeCamera(Camera):
                 px = scene.view_plane.pixel_size * (column - 0.5 * width + 0.5)
                 py = scene.view_plane.pixel_size * (row - 0.5 * height + 0.5) 
                 ray_direction = self.u.scalar(px) + self.v.scalar(py) - self.w.scalar(self.viewplane_distance)
-                #print self.u, self.v, self.w
-                ray_direction.normalize()
-                L = scene.tracer.trace_ray(ray_origin, ray_direction)
-                pixels[row, column] = (int(L.r), int(L.g), int(L.b))
+                ray_direction = ray_direction.normalize()
 
+                L = scene.tracer.trace_ray(ray_origin, ray_direction)
+                L = L.scalar(255.0)      
+
+                # view plane coordinates to screen coordinates
+                pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
+        
         picture.show()
+        #filename = "render.jpg"
+        #picture.save(filename)
+        #picture.show(filename)

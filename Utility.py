@@ -37,7 +37,7 @@ class Point:
         return "Point" + str(self)
          
     def move(self, vector): 
-        return Vector(self.x + vector.x, self.y + vector.y, self.z + vector.z)
+        return Point(self.x + vector.x, self.y + vector.y, self.z + vector.z)
     
     def substract(self, other): 
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
@@ -46,7 +46,7 @@ class Point:
         dx = self.x - other.x
         dy = self.y - other.y
         dz = self.z - other.z
-        return math.sqrt(dx * dx, dy * dy, dz * dz)
+        return math.sqrt(dx * dx + dy * dy + dz * dz)
 
 
 class Vector(object):
