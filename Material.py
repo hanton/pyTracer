@@ -12,8 +12,7 @@ class Matte(Material):
         self.diffuse_brdf = Lambertian(kd, cd)
         
     def shade(self, shading_point):
-        #wo = -shading_point.ray.direction
-        L = self.ambient_brdf.rho() * shading_point.scene.ambient_light.L()
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L()
         for light in shading_point.scene.lights:
             wi = light.get_direction().scalar(-1.0)
             wi = wi.normalize()
@@ -25,7 +24,7 @@ class Matte(Material):
                     shadow_ray = Ray(shading_point.hit_point, wi)
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
-                    L = L + self.diffuse_brdf.f() * light.L()
+                    L = L + self.diffuse_brdf.f(shading_point) * light.L()
                     L = L.scalar(ndotwi)
 
         return L
@@ -40,14 +39,20 @@ class Phong(Material):
     def shade(self, shading_point):
         wo = shading_point.ray.direction.scalar(-1.0)
         wo = wo.normalize()
-        L = self.ambient_brdf.rho() * shading_point.scene.ambient_light.L()
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L()
         for light in shading_point.scene.lights:
             wi = light.get_direction().scalar(-1.0)
             wi = wi.normalize()
             ndotwi = shading_point.normal.dot(wi)
             if ndotwi > 0.0:
-                L = L + (self.diffuse_brdf.f() + self.specular_brdf.f(shading_point, wo, wi)) * light.L()
-                L = L.scalar(ndotwi)
+                in_shadow = False
+
+                if light.cast_shadow:
+                    shadow_ray = Ray(shading_point.hit_point, wi)
+                    in_shadow = light.in_shadow(shadow_ray, shading_point)
+                if not in_shadow:
+                    L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L()
+                    L = L.scalar(ndotwi)
 
         return L
 
@@ -62,11 +67,11 @@ class Lambertian(BRDF):
         self.kd = kd
         self.cd = cd
 
-    def rho(self):
-        return self.cd.scalar(self.kd)
+    def rho(self, shading_point):
+        return self.cd.get_color(shading_point).scalar(self.kd)
     
-    def f(self):
-        return self.cd.scalar(self.kd / math.pi)
+    def f(self, shading_point):
+        return self.cd.get_color(shading_point).scalar(self.kd / math.pi)
 
 
 class GlossySpecular(BRDF):
@@ -81,6 +86,51 @@ class GlossySpecular(BRDF):
         rdotwo = r.dot(wo)
 
         if rdotwo > 0.0:
-            return self.cd.scalar(self.ks * pow(rdotwo, self.exp))
+            return self.cd.get_color(shading_point).scalar(self.ks * pow(rdotwo, self.exp))
         else:
             return Color(0.0, 0.0, 0.0)
+
+
+class ConstantColor:
+    def __init__(self, color):
+        self.color = color
+
+    def get_color(self, shading_point):
+        return self.color
+
+
+class ImageTexture:
+    def __init__(self, texels, mapping, image_width, image_height):
+        self.texels  = texels
+        self.mapping = mapping
+        self.hres    = image_width
+        self.vres    = image_height
+
+    def get_color(self, shading_point):
+        self.mapping.get_texel_coordinates(shading_point.local_hit_point, self.hres, self.vres)
+        column  = self.mapping.column
+        row     = self.mapping.row
+        r, g, b = self.texels[column, row]
+        return Color(r / 255.0, g / 255.0, b / 255.0)
+
+
+class Mapping:
+    pass
+
+
+class SphericalMapping(Mapping):
+    def __init__(self):
+        self.column = 0
+        self.row    = 0
+    def get_texel_coordinates(self, local_hit_point, hres, vres):
+        theta = math.acos(local_hit_point.y)
+        phi   = math.atan2(local_hit_point.x, local_hit_point.z)
+        pi    = math.pi
+        
+        if phi < 0.0:
+            phi += 2.0 * pi
+         
+        u = phi * (1.0 / (2.0 * pi))
+        v = 1.0 - theta * (1.0 / pi)
+        self.column = int((hres - 1) * u)
+        self.row    = int((vres - 1) * v)

@@ -30,7 +30,7 @@ class Sphere:
                 self.t = t
                 hit_point = ray.origin.move(ray.direction.scalar(self.t))
                 self.hit_point_normal = hit_point.substract(self.center).scalar(1.0 / self.radius) 
-                self.local_hit_point = hit_point
+                self.local_hit_point = hit_point.scalar(self.radius)
                 return True
 
             e = math.sqrt(discriminant)
@@ -40,7 +40,7 @@ class Sphere:
                 self.t = t
                 hit_point = ray.origin.move(ray.direction.scalar(self.t))
                 self.hit_point_normal = hit_point.substract(self.center).scalar(1.0 / self.radius)
-                self.local_hit_point = hit_point
+                self.local_hit_point = hit_point.scalar(self.radius)
                 return True
 
     def shadow_hit(self, ray):

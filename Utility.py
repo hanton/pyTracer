@@ -48,6 +48,9 @@ class Point:
         dz = self.z - other.z
         return math.sqrt(dx * dx + dy * dy + dz * dz)
 
+    def scalar(self, scalar):
+        return Point(self.x / scalar, self.y / scalar, self.z / scalar)
+
 
 class Vector(object):
     def __init__(self, x, y, z):

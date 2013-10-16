@@ -41,7 +41,7 @@ class PinholeCamera(Camera):
                 # view plane coordinates to screen coordinates
                 pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
         
-        picture.show()
-        #filename = "render.jpg"
-        #picture.save(filename)
-        #picture.show(filename)
+        filename = "render.tiff"
+        picture.save(filename)
+        #picture = Image.open(filename)
+        #picture.show()
