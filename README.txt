@@ -17,8 +17,8 @@ Geometry: Sphere, Plane
 
 How to Run
 ===========
-   python pyRayTracer              - to render a default 640*320 picture
-or python pyRayTracer width height - to render a width*height picture
+   python pyRayTracer                            - to render a default 640*320 with 4 pixel samples picture
+or python pyRayTracer width height pixel_samples - to render a width*height with num_samples pixel samples picture
 
 
 ===========

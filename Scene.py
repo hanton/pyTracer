@@ -19,9 +19,9 @@ class Scene:
     def add_shape(self, shape):
         self.shapes.append(shape)
 
-    def build(self, width, height):
-        num_samples    = 16
-        num_sets       = 83
+    def build(self, width, height, samples):
+        num_samples    = samples
+        num_sets       = 83  # default vaule
         pixel_size = 1.0
         gamma      = 1.0
         self.view_plane = ViewPlane(width, height, pixel_size, gamma, num_samples, num_sets)
