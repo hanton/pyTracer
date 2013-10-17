@@ -1,5 +1,7 @@
 from PIL import Image
 
+from Utility import Color
+
 class Camera:
     pass
 
@@ -28,20 +30,25 @@ class PinholeCamera(Camera):
         pixels = picture.load()
         ray_origin = self.eye
         
-        for row in range(0, height - 1):
-            for column in range(0, width - 1):
-                px = scene.view_plane.pixel_size * (column - 0.5 * width + 0.5)
-                py = scene.view_plane.pixel_size * (row - 0.5 * height + 0.5) 
-                ray_direction = self.u.scalar(px) + self.v.scalar(py) - self.w.scalar(self.viewplane_distance)
-                ray_direction = ray_direction.normalize()
+        for row in range(0, height):
+            print "Render {0:.2f}%".format(float(row) / height * 100.0)
+            for column in range(0, width):
+                L = Color(0.0, 0.0, 0.0)                
+                for j in range(0, scene.view_plane.sampler.num_samples):
+                    # sp range [0.0 ~ 1.0] [0.0 ~ 1.0]
+                    sp = scene.view_plane.sampler.sample_unit_square()
+                    px = scene.view_plane.pixel_size * (column - 0.5 * width + sp.x)
+                    py = scene.view_plane.pixel_size * (row - 0.5 * height + sp.y) 
+                    ray_direction = self.u.scalar(px) + self.v.scalar(py) - self.w.scalar(self.viewplane_distance)
+                    ray_direction = ray_direction.normalize()
+                    L = L + scene.tracer.trace_ray(ray_origin, ray_direction)
+                L = L.scalar(1.0 / scene.view_plane.sampler.num_samples)
 
-                L = scene.tracer.trace_ray(ray_origin, ray_direction)
-                L = L.scalar(255.0)      
-
+                # color 0.0~1.0 to Image module's 0~255 color range
+                L = L.scalar(255.0)
                 # view plane coordinates to screen coordinates
                 pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
         
         filename = "render.tiff"
         picture.save(filename)
-        #picture = Image.open(filename)
-        #picture.show()
+        picture.show()

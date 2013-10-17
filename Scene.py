@@ -20,9 +20,11 @@ class Scene:
         self.shapes.append(shape)
 
     def build(self, width, height):
+        num_samples    = 16
+        num_sets       = 83
         pixel_size = 1.0
-        gamma = 1.0
-        self.view_plane = ViewPlane(width, height, pixel_size, gamma)
+        gamma      = 1.0
+        self.view_plane = ViewPlane(width, height, pixel_size, gamma, num_samples, num_sets)
 
         self.tracer = RayCast(self)
         self.background_color = Color(0.0, 0.0, 0.0)

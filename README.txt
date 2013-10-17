@@ -3,6 +3,15 @@ pyRayTracer
 
 pyRayTracer is a Ray Tracer in Python. I write it for learning speaking Python and Ray Tracing.
 
+(ready to be commanded functions) =
+Camera : Pinhole Camera
+Sampler: Multijittered Sampler, Regular Sampler
+Texture: Image Texture
+BRDF: Diffuse, Specular
+Light: Ambient Light, Direction Light
+Shadow
+Geometry: Sphere, Plane
+
 
 How to Run
 ===========
