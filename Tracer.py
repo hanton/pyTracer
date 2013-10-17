@@ -1,7 +1,8 @@
 from Utility import Ray
 
 class Tracer:
-    pass
+    def trace_ray(self, ray_origin, ray_direction):
+        pass
 
 
 class RayCast:

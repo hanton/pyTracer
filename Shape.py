@@ -1,6 +1,17 @@
 import math
 
-class Sphere:
+class Shape:
+    def get_material(self):
+        pass
+
+    def hit(self, ray):
+        pass
+    
+    def shadow_hit(self, ray):
+        pass
+
+
+class Sphere(Shape):
     def __init__(self, center, radius, material):
         self.center = center
         self.radius = radius

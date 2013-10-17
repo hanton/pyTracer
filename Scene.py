@@ -20,7 +20,7 @@ class Scene:
         self.shapes.append(shape)
 
     def build(self, width, height):
-        num_samples    = 16
+        num_samples    = 25 
         num_sets       = 83
         pixel_size = 1.0
         gamma      = 1.0

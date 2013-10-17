@@ -1,7 +1,11 @@
 from Utility import Vector
 
 class Light:
-    pass
+    def get_direction(self):
+        pass
+
+    def L(self):
+        pass
 
 class AmbientLight(Light):
     def __init__(self, ls, color):

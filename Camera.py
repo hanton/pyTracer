@@ -3,10 +3,6 @@ from PIL import Image
 from Utility import Color
 
 class Camera:
-    pass
-
-
-class PinholeCamera(Camera):
     def __init__(self, eye, lookat, up, viewplane_distance):
         self.eye                = eye
         self.lookat             = lookat
@@ -20,6 +16,8 @@ class PinholeCamera(Camera):
         self.u = self.u.normalize()
         self.v = self.w.cross(self.u)
 
+
+class PinholeCamera(Camera):
     def ray_direction(self, x, y):
         return direction
 

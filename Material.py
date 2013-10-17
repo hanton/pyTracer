@@ -91,7 +91,12 @@ class GlossySpecular(BRDF):
             return Color(0.0, 0.0, 0.0)
 
 
-class ConstantColor:
+class Surface:
+    def get_color(self, shading_point):
+        pass
+
+
+class ConstantColor(Surface):
     def __init__(self, color):
         self.color = color
 
@@ -99,7 +104,7 @@ class ConstantColor:
         return self.color
 
 
-class ImageTexture:
+class ImageTexture(Surface):
     def __init__(self, texels, mapping, image_width, image_height):
         self.texels  = texels
         self.mapping = mapping
@@ -115,13 +120,15 @@ class ImageTexture:
 
 
 class Mapping:
-    pass
+    def get_texel_coordinates(self, local_hit_point, hres, vres):
+        pass
 
 
 class SphericalMapping(Mapping):
     def __init__(self):
         self.column = 0
         self.row    = 0
+
     def get_texel_coordinates(self, local_hit_point, hres, vres):
         theta = math.acos(local_hit_point.y)
         phi   = math.atan2(local_hit_point.x, local_hit_point.z)
