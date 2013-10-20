@@ -12,7 +12,7 @@ class Matte(Material):
         self.diffuse_brdf = Lambertian(kd, cd)
         
     def shade(self, shading_point):
-        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L()
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
             wi = light.get_direction().scalar(-1.0)
             wi = wi.normalize()
@@ -29,6 +29,24 @@ class Matte(Material):
 
         return L
 
+    def area_light_shade(self, shading_point):
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
+        for light in shading_point.scene.lights:
+            wi = light.get_direction(shading_point).scalar(-1.0)
+            wi = wi.normalize()
+            ndotwi = shading_point.normal.dot(wi)
+            if ndotwi > 0.0:
+                in_shadow = False
+
+                if light.cast_shadow:
+                    shadow_ray = Ray(shading_point.hit_point, wi)
+                    in_shadow = light.in_shadow(shadow_ray, shading_point)
+                if not in_shadow:
+                    L = L + self.diffuse_brdf.f(shading_point) * light.L()
+                    L = L.scalar(ndotwi * light.G(shading_point) / light.pdf(shading_point))
+
+        return L
+
 
 class Phong(Material):
     def __init__(self, ka, kd, ks, cd, exp):
@@ -39,7 +57,7 @@ class Phong(Material):
     def shade(self, shading_point):
         wo = shading_point.ray.direction.scalar(-1.0)
         wo = wo.normalize()
-        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L()
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
             wi = light.get_direction().scalar(-1.0)
             wi = wi.normalize()
@@ -55,6 +73,43 @@ class Phong(Material):
                     L = L.scalar(ndotwi)
 
         return L
+
+    def area_light_shade(self, shading_point):
+        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = wo.normalize()
+        L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
+        for light in shading_point.scene.lights:
+            wi = light.get_direction(shading_point).scalar(-1.0)
+            wi = wi.normalize()
+            ndotwi = shading_point.normal.dot(wi)
+            if ndotwi > 0.0:
+                in_shadow = False
+
+                if light.cast_shadow:
+                    shadow_ray = Ray(shading_point.hit_point, wi)
+                    in_shadow = light.in_shadow(shadow_ray, shading_point)
+                if not in_shadow:
+                    L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L() 
+                    L = L.scalar(ndotwi * light.G(shading_point) / light.pdf(shading_point))
+
+        return L
+
+
+class Emissive(Material):
+    def __init__(self, ls, ce):
+        self.ls = ls
+        self.ce = ce
+
+    def area_light_shade(self, shading_point):
+        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = wo.normalize()  
+        if shading_point.normal.dot(wo) > 0.0:
+            return self.ce.scalar(self.ls) 
+        else:
+            return Color(0.0, 0.0, 0.0)
+    
+    def Le(self):
+        return self.ce.scalar(self.ls)
 
 
 class BRDF:

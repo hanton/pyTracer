@@ -7,7 +7,7 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         width   = 640
         height  = 320
-        samples = 4
+        samples = 1
     else:
         width   = int(sys.argv[1])
         height  = int(sys.argv[2])

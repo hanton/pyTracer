@@ -26,6 +26,7 @@ class PinholeCamera(Camera):
         height = scene.view_plane.get_height()
         picture = Image.new('RGB', (width, height))
         pixels = picture.load()
+
         ray_origin = self.eye
         
         for row in range(0, height):
@@ -49,4 +50,4 @@ class PinholeCamera(Camera):
         
         filename = "render.tiff"
         picture.save(filename)
-        picture.show()
+        picture.show()        
