@@ -10,7 +10,7 @@ Camera : Pinhole Camera
 Sampler: Multijittered Sampler, Regular Sampler
 Texture: Image Texture
 BRDF: Diffuse, Specular
-Light: Ambient Light, Direction Light
+Light: Ambient Light, Direction Light, Ambient Occlusion, Area Light
 Shadow
 Geometry: Sphere, Plane
 
