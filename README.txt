@@ -9,7 +9,7 @@ pyRayTracer is a Ray Tracer in Python. I write it for learning speaking Python a
 Camera : Pinhole Camera
 Sampler: Multijittered Sampler, Regular Sampler
 Texture: Image Texture
-BRDF: Diffuse, Specular
+BRDF: Diffuse, Specular, Mirror Specular
 Light: Ambient Light, Direction Light, Ambient Occlusion, Area Light
 Shadow
 Geometry: Sphere, Plane
