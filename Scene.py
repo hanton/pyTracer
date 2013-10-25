@@ -1,13 +1,14 @@
 from PIL import Image
-from ViewPlane import ViewPlane
-from Utility import Color, Point, Vector, Ray
-from Shape import Sphere, Plane, Rectangle
-from Tracer import RayCast, AreaLighting
-from Camera import PinholeCamera
-from Light import AmbientLight, DirectionalLight, AmbientOcclusion, AreaLight, EnvironmentLight
-from ShadingPoint import ShadingPoint
-from Material import Matte, Phong, ConstantColor, ImageTexture, SphericalMapping, Emissive
-from Sampler import MultiJittered
+
+from ViewPlane import * 
+from Utility import *
+from Shape import *
+from Tracer import *
+from Camera import *
+from Light import *
+from ShadingPoint import *
+from Material import *
+from Sampler import *
 
 class Scene:
     def __init__(self):
@@ -23,15 +24,16 @@ class Scene:
     def build(self, width, height, samples):
         num_samples    = samples
         num_sets       = 83  # default vaule
-        pixel_size = 1.0
-        gamma      = 1.0
-        self.view_plane = ViewPlane(width, height, pixel_size, gamma, num_samples, num_sets)
+        pixel_size     = 1.0
+        gamma          = 1.0
+        max_ray_depth  = 0
+        self.view_plane = ViewPlane(width, height, pixel_size, gamma, max_ray_depth, num_samples, num_sets)
         self.background_color = Color(0.0, 0.0, 0.0)
 
-        eye = Point(0, 0, 700)
+        eye = Point(-900, 900, 900)
         lookat = Point(0, 0, 1)
         up = Vector(0, 1, 0)
-        viewplane_distance = 400
+        viewplane_distance = 300
         self.camera = PinholeCamera(eye, lookat, up, viewplane_distance)
         self.camera.compute_uvw()
 
@@ -39,8 +41,11 @@ class Scene:
         #self.diffuse_specular_texture_directionlight_shadow()
         #self.ambient_occlusion(num_samples, num_sets)
         
-        self.tracer = AreaLighting(self)
-        self.area_lighting(num_samples, num_sets)
+        #self.tracer = AreaLighting(self)
+        #self.area_lighting(num_samples, num_sets)
+
+        self.tracer = Whitted(self)
+        self.perfect_specular(num_samples, num_sets)
 
     def hit_objects(self, ray_origin, ray_direction):
         ray = Ray(ray_origin, ray_direction)
@@ -69,7 +74,8 @@ class Scene:
         matte             = Matte(ka, kd, texture)
         center = Point(0.0, 0.0, -100.0)
         radius = 100.0
-        sphere = Sphere(center, radius, matte)
+        block_light = True        
+        sphere = Sphere(center, radius, matte, block_light)
         self.add_shape(sphere)
 
         ka    = 0.0
@@ -79,7 +85,8 @@ class Scene:
         matte = Matte(ka, kd, constant_color)
         center = Point(300.0, 0.0, -100.0)
         radius = 100.0
-        sphere = Sphere(center, radius, matte)
+        block_light = True
+        sphere = Sphere(center, radius, matte, block_light)
         self.add_shape(sphere)
 
         ka    = 0.0
@@ -89,7 +96,8 @@ class Scene:
         matte = Matte(ka, kd, constant_color)
         center = Point(0.0, -100.0, 0.0)
         normal = Vector(0.0, 1.0, 0.0)
-        plane = Plane(center, normal, matte)
+        block_light = True
+        plane = Plane(center, normal, matte, block_light)
         self.add_shape(plane)
         
         ka    = 0.0
@@ -99,10 +107,10 @@ class Scene:
         constant_color = ConstantColor(color)
         exp   = 5.0
         phong = Phong(ka, kd, ks, constant_color, exp)
-
         center = Point(-300.0, 0.0, -100.0)
         radius = 100.0
-        sphere = Sphere(center, radius, phong)
+        block_light = True
+        sphere = Sphere(center, radius, phong, block_light)
         self.add_shape(sphere)
 
         light_color     = Color(1.0, 1.0, 1.0)
@@ -192,3 +200,74 @@ class Scene:
         light_color     = Color(1.0, 1.0, 1.0)
         light_intensity    = 0.0
         self.ambient_light = AmbientLight(light_intensity, light_color)        
+
+    def perfect_specular(self, num_samples, num_sets):
+        self.view_plane.max_ray_depth = 3
+        self.view_plane.pixel_size    = 0.2
+
+        ka    = 0.0
+        kd    = 0.6
+        ks    = 0.15
+        color = Color(1.0, 0.0, 0.0)
+        constant_color = ConstantColor(color)
+        exp   = 100.0
+        kr = 0.75
+        kc = Color(1.0, 1.0, 1.0)
+        reflective = Reflective(ka, kd, ks, constant_color, exp, kr, kc)
+        center = Point(-300.0, 0.0, -100.0)
+        radius = 100.0
+        block_light = True        
+        sphere = Sphere(center, radius, reflective, block_light)
+        self.add_shape(sphere)
+
+        ka    = 0.0
+        kd    = 0.6
+        ks    = 0.15
+        color = Color(0.0, 1.0, 0.0)
+        constant_color = ConstantColor(color)
+        exp   = 100.0
+        kr = 0.75
+        kc = Color(1.0, 1.0, 1.0)
+        reflective = Reflective(ka, kd, ks, constant_color, exp, kr, kc)
+        center = Point(0.0, 0.0, -100.0)
+        radius = 100.0
+        block_light = True        
+        sphere = Sphere(center, radius, reflective, block_light)
+        self.add_shape(sphere)
+
+        ka    = 0.0
+        kd    = 0.6
+        ks    = 0.15
+        color = Color(0.0, 0.0, 1.0)
+        constant_color = ConstantColor(color)
+        exp   = 100.0
+        kr = 0.75
+        kc = Color(1.0, 1.0, 1.0)
+        reflective = Reflective(ka, kd, ks, constant_color, exp, kr, kc)
+        center = Point(-150.0, 0.0, 100.0)
+        radius = 100.0
+        block_light = True                
+        sphere = Sphere(center, radius, reflective, block_light)
+        self.add_shape(sphere)
+
+        ka    = 0.0
+        kd    = 1.0
+        color = Color(0.6, 0.6, 0.6)
+        constant_color = ConstantColor(color)        
+        matte = Matte(ka, kd, constant_color)
+        center = Point(0.0, -100.0, 0.0)
+        normal = Vector(0.0, 1.0, 0.0)
+        block_light = True        
+        plane = Plane(center, normal, matte, block_light)
+        self.add_shape(plane)
+
+        light_color     = Color(1.0, 1.0, 1.0)
+        light_intensity    = 0.0
+        self.ambient_light = AmbientLight(light_intensity, light_color)        
+
+        light_color     = Color(1.0, 1.0, 1.0)
+        light_direction = Vector(-1.0, -2.0, -3.0)
+        light_intensity = 3.0
+        cast_shadow     = True
+        direction_light = DirectionalLight(light_intensity, light_color, light_direction, cast_shadow)
+        self.add_light(direction_light)

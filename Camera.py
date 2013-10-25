@@ -19,6 +19,9 @@ class Camera:
 
 class PinholeCamera(Camera):
     def ray_direction(self, x, y):
+        direction = self.u.scalar(x) + self.v.scalar(y) - self.w.scalar(self.viewplane_distance)
+        direction = direction.normalize()
+
         return direction
 
     def render(self, scene):
@@ -30,7 +33,6 @@ class PinholeCamera(Camera):
         ray_origin = self.eye
         
         for row in range(0, height):
-            print "Render {0:.2f}%".format(float(row) / height * 100.0)
             for column in range(0, width):
                 L = Color(0.0, 0.0, 0.0)                
                 for j in range(0, scene.view_plane.sampler.num_samples):
@@ -38,16 +40,28 @@ class PinholeCamera(Camera):
                     sp = scene.view_plane.sampler.sample_unit_square()
                     px = scene.view_plane.pixel_size * (column - 0.5 * width + sp.x)
                     py = scene.view_plane.pixel_size * (row - 0.5 * height + sp.y) 
-                    ray_direction = self.u.scalar(px) + self.v.scalar(py) - self.w.scalar(self.viewplane_distance)
-                    ray_direction = ray_direction.normalize()
-                    L = L + scene.tracer.trace_ray(ray_origin, ray_direction)
+                    ray_direction = self.ray_direction(px, py)
+                    ray_depth = 0
+                    L = L + scene.tracer.trace_ray(ray_origin, ray_direction, ray_depth)
                 L = L.scalar(1.0 / scene.view_plane.sampler.num_samples)
 
                 # color 0.0~1.0 to Image module's 0~255 color range
                 L = L.scalar(255.0)
                 # view plane coordinates to screen coordinates
                 pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
+            print "Render {0:.2f}%".format(float(row + 1) / height * 100.0)            
         
         filename = "render.tiff"
         picture.save(filename)
-        picture.show()        
+        picture.show()
+
+
+class ThinLens(Camera):
+    def __init__(self):
+        pass
+
+    def ray_direction(self, x, y):
+        pass
+
+    def render(self, scene):
+        pass

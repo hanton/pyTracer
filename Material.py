@@ -95,6 +95,26 @@ class Phong(Material):
         return L
 
 
+class Reflective(Phong):
+    def __init__(self, ka, kd, ks, cd, exp, kr, cr):
+        Phong.__init__(self, ka, kd, ks, cd, exp)
+        self.reflective_brdf = PerfectSpecular(kr, cr)
+        
+    def shade(self, shading_point):
+        #L = Color(0.0, 0.0, 0.0)
+        L = Phong.shade(self, shading_point)
+
+        wo = shading_point.ray.direction.scalar(-1.0)
+        fr = self.reflective_brdf.sample_f(shading_point, wo)
+        wi = self.reflective_brdf.wi
+        reflected_ray_origin = shading_point.hit_point
+        reflected_ray_direction = wi
+        ndotwi = shading_point.normal.dot(wi)
+        L = L + shading_point.scene.tracer.trace_ray(reflected_ray_origin, reflected_ray_direction, shading_point.ray_depth + 1) * fr.scalar(ndotwi)
+
+        return L
+
+
 class Emissive(Material):
     def __init__(self, ls, ce):
         self.ls = ls
@@ -144,6 +164,19 @@ class GlossySpecular(BRDF):
             return self.cd.get_color(shading_point).scalar(self.ks * pow(rdotwo, self.exp))
         else:
             return Color(0.0, 0.0, 0.0)
+
+
+class PerfectSpecular(BRDF):
+    def __init__(self, kr, cr):
+        self.kr = kr
+        self.cr = cr
+
+    def sample_f(self, shading_point, wo):
+        ndotwo = shading_point.normal.dot(wo)
+        wi     = wo.scalar(-1.0) + shading_point.normal.scalar(2.0 * ndotwo)
+        self.wi = wi
+        ndotwi = shading_point.normal.dot(wi)
+        return self.cr.scalar(self.kr / ndotwi)
 
 
 class Surface:
