@@ -205,9 +205,10 @@ class Scene:
         self.view_plane.max_ray_depth = 3
         self.view_plane.pixel_size    = 0.2
 
+        # ks = kr
         ka    = 0.0
-        kd    = 0.6
-        ks    = 0.15
+        kd    = 0.25
+        ks    = 0.75
         color = Color(1.0, 0.0, 0.0)
         constant_color = ConstantColor(color)
         exp   = 100.0
@@ -221,8 +222,8 @@ class Scene:
         self.add_shape(sphere)
 
         ka    = 0.0
-        kd    = 0.6
-        ks    = 0.15
+        kd    = 0.25
+        ks    = 0.75
         color = Color(0.0, 1.0, 0.0)
         constant_color = ConstantColor(color)
         exp   = 100.0
@@ -236,8 +237,8 @@ class Scene:
         self.add_shape(sphere)
 
         ka    = 0.0
-        kd    = 0.6
-        ks    = 0.15
+        kd    = 0.25
+        ks    = 0.75
         color = Color(0.0, 0.0, 1.0)
         constant_color = ConstantColor(color)
         exp   = 100.0
