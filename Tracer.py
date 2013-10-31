@@ -9,7 +9,7 @@ class Tracer:
 
 
 class RayCast(Tracer):
-    def trace_ray(self, ray_origin, ray_direction):
+    def trace_ray(self, ray_origin, ray_direction, ray_depth):
         shading_point = self.scene.hit_objects(ray_origin, ray_direction)
          
         if(shading_point.hit_an_object):
@@ -21,7 +21,7 @@ class RayCast(Tracer):
 
 
 class AreaLighting(Tracer):
-    def trace_ray(self, ray_origin, ray_direction):
+    def trace_ray(self, ray_origin, ray_direction, ray_depth):
         shading_point = self.scene.hit_objects(ray_origin, ray_direction)
          
         if(shading_point.hit_an_object):

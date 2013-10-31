@@ -18,4 +18,4 @@ if __name__ == '__main__':
     s.camera.render(s)
 
     end_time = time.time()
-    print "Render Time: " + str(int(end_time - start_time)) + " seconds."
+    print "\n" + "Render Time: " + str(int(end_time - start_time)) + " seconds."

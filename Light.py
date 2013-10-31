@@ -17,7 +17,7 @@ class AmbientLight(Light):
         return Vector(0.0, 0.0, 0.0)
 
     def L(self, shading_point):
-        return self.color.scalar(self.ls)
+        return self.ls * self.color
 
 
 class AmbientOcclusion(Light):
@@ -68,7 +68,7 @@ class DirectionalLight(Light):
         return self.direction
 
     def L(self):
-        return self.color.scalar(self.ls)
+        return self.ls * self.color
 
     def in_shadow(self, ray, shading_point): 
         for shape in shading_point.scene.shapes:

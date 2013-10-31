@@ -14,9 +14,9 @@ class Matte(Material):
     def shade(self, shading_point):
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction().scalar(-1.0)
+            wi = light.get_direction() * -1.0
             wi = wi.normalize()
-            ndotwi = shading_point.normal.dot(wi)
+            ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
                 in_shadow = False
 
@@ -25,7 +25,7 @@ class Matte(Material):
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
                     L = L + self.diffuse_brdf.f(shading_point) * light.L()
-                    L = L.scalar(ndotwi)
+                    L = L * ndotwi
 
         return L
 
@@ -43,7 +43,7 @@ class Matte(Material):
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
                     L = L + self.diffuse_brdf.f(shading_point) * light.L()
-                    L = L.scalar(ndotwi * light.G(shading_point) / light.pdf(shading_point))
+                    L = L * ndotwi * light.G(shading_point) / light.pdf(shading_point)
 
         return L
 
@@ -55,13 +55,13 @@ class Phong(Material):
         self.specular_brdf = GlossySpecular(ks, exp, cd)
         
     def shade(self, shading_point):
-        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = shading_point.ray.direction * -1.0
         wo = wo.normalize()
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction().scalar(-1.0)
+            wi = light.get_direction() * -1.0
             wi = wi.normalize()
-            ndotwi = shading_point.normal.dot(wi)
+            ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
                 in_shadow = False
 
@@ -70,18 +70,18 @@ class Phong(Material):
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
                     L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L()
-                    L = L.scalar(ndotwi)
+                    L = L * ndotwi
 
         return L
 
     def area_light_shade(self, shading_point):
-        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = shading_point.ray.direction * -1.0
         wo = wo.normalize()
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction(shading_point).scalar(-1.0)
+            wi = light.get_direction(shading_point) * -1.0
             wi = wi.normalize()
-            ndotwi = shading_point.normal.dot(wi)
+            ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
                 in_shadow = False
 
@@ -90,7 +90,7 @@ class Phong(Material):
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
                     L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L() 
-                    L = L.scalar(ndotwi * light.G(shading_point) / light.pdf(shading_point))
+                    L = L * ndotwi * light.G(shading_point) / light.pdf(shading_point)
 
         return L
 
@@ -104,7 +104,7 @@ class Reflective(Phong):
         #L = Color(0.0, 0.0, 0.0)
         L = Phong.shade(self, shading_point)
 
-        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = shading_point.ray.direction * -1.0
         fr = self.reflective_brdf.sample_f(shading_point, wo)
         wi = self.reflective_brdf.wi
         reflected_ray_origin = shading_point.hit_point
@@ -121,7 +121,7 @@ class Emissive(Material):
         self.ce = ce
 
     def area_light_shade(self, shading_point):
-        wo = shading_point.ray.direction.scalar(-1.0)
+        wo = shading_point.ray.direction * -1.0
         wo = wo.normalize()  
         if shading_point.normal.dot(wo) > 0.0:
             return self.ce.scalar(self.ls) 
@@ -138,30 +138,33 @@ class BRDF:
 
 
 class Lambertian(BRDF):
-    def __init__(self, kd, cd):
+    def __init__(self, kd, surface):
         self.kd = kd
-        self.cd = cd
+        self.surface = surface
 
     def rho(self, shading_point):
-        return self.cd.get_color(shading_point).scalar(self.kd)
+        color = self.surface.get_color(shading_point)
+        return  self.kd * color
     
     def f(self, shading_point):
-        return self.cd.get_color(shading_point).scalar(self.kd / math.pi)
+        color = self.surface.get_color(shading_point)
+        return (self.kd * color) / math.pi
 
 
 class GlossySpecular(BRDF):
-    def __init__(self, ks, exp, cd):
+    def __init__(self, ks, exp, surface):
         self.ks  = ks
         self.exp = exp
-        self.cd  = cd
+        self.surface  = surface
 
     def f(self, shading_point, wo, wi):
-        ndotwi = shading_point.normal.dot(wi)
-        r = wi.scalar(-1.0) + shading_point.normal.scalar(2.0 * ndotwi)
-        rdotwo = r.dot(wo)
+        ndotwi = shading_point.normal * wi
+        r = wi * -1.0 + shading_point.normal * (2.0 * ndotwi)
+        rdotwo = r * wo
 
         if rdotwo > 0.0:
-            return self.cd.get_color(shading_point).scalar(self.ks * pow(rdotwo, self.exp))
+            color = self.surface.get_color(shading_point)
+            return (self.ks * color) * pow(rdotwo, self.exp)
         else:
             return Color(0.0, 0.0, 0.0)
 
@@ -173,9 +176,9 @@ class PerfectSpecular(BRDF):
 
     def sample_f(self, shading_point, wo):
         ndotwo = shading_point.normal.dot(wo)
-        wi     = wo.scalar(-1.0) + shading_point.normal.scalar(2.0 * ndotwo)
+        wi     = wo * -1.0 + shading_point.normal * (2.0 * ndotwo)
         self.wi = wi
-        ndotwi = shading_point.normal.dot(wi)
+        ndotwi = shading_point.normal * wi
         return self.cr.scalar(self.kr / ndotwi)
 
 
@@ -188,7 +191,7 @@ class ConstantColor(Surface):
     def __init__(self, color):
         self.color = color
 
-    def get_color(self, shading_point):
+    def get_color(self, shading_point = None):
         return self.color
 
 
@@ -200,9 +203,7 @@ class ImageTexture(Surface):
         self.vres    = image_height
 
     def get_color(self, shading_point):
-        self.mapping.get_texel_coordinates(shading_point.local_hit_point, self.hres, self.vres)
-        column  = self.mapping.column
-        row     = self.mapping.row
+        column, row = self.mapping.get_texel_coordinates(shading_point.local_hit_point, self.hres, self.vres)
         r, g, b = self.texels[column, row]
         return Color(r / 255.0, g / 255.0, b / 255.0)
 
@@ -227,5 +228,7 @@ class SphericalMapping(Mapping):
          
         u = phi * (1.0 / (2.0 * pi))
         v = 1.0 - theta * (1.0 / pi)
-        self.column = int((hres - 1) * u)
-        self.row    = int((vres - 1) * v)
+        column = int((hres - 1) * u)
+        row    = int((vres - 1) * v)
+
+        return column, row

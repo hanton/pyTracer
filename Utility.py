@@ -17,12 +17,21 @@ class Color:
         return Color(self.r - other.r, self.g - other.g, self.b - other.b)
     
     def __mul__(self, other): 
-        return Color(self.r * other.r, self.g * other.g, self.b * other.b)
+        if isinstance(other, Color):
+            return Color(self.r * other.r, self.g * other.g, self.b * other.b)
+        else:
+            return Color(self.r * other, self.g * other, self.b * other)
 
-    def scalar(self, scalar): 
-        return Color(scalar * self.r, scalar * self.g, scalar * self.b)
+    def __rmul__(self, other): 
+        if isinstance(other, Color):
+            return Color(self.r * other.r, self.g * other.g, self.b * other.b)
+        else:
+            return Color(self.r * other, self.g * other, self.b * other)
 
-    def pow(self, power):
+    def __div__(self, other):
+        return Color(self.r / other, self.g / other, self.b / other)
+
+    def powc(self, power):
         return Color(self.r ** power, self.g ** power, self.b ** power)
 
 
@@ -36,10 +45,11 @@ class Point:
     def __repr__(self): 
         return "Point" + str(self)
          
-    def move(self, vector): 
+    def __add__(self, vector):
+        # move the point in the vector direction
         return Point(self.x + vector.x, self.y + vector.y, self.z + vector.z)
     
-    def substract(self, other): 
+    def __sub__(self, other):
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def distance(self, other):
@@ -48,8 +58,8 @@ class Point:
         dz = self.z - other.z
         return math.sqrt(dx * dx + dy * dy + dz * dz)
 
-    def scalar(self, scalar):
-        return Point(self.x / scalar, self.y / scalar, self.z / scalar)
+#    def scalar(self, scalar):
+#        return Point(self.x * scalar, self.y * scalar, self.z * scalar)
 
 
 class Vector(object):
@@ -68,12 +78,25 @@ class Vector(object):
     def __sub__(self, other): 
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def scalar(self, scalar): 
-        return Vector(scalar * self.x, scalar * self.y, scalar * self.z)
+    def __mul__(self, other):
+        if isinstance(other, Vector):
+            # dot multiple
+            return self.x * other.x + self.y * other.y + self.z * other.z
+        else:    
+            # scale
+            return Vector(self.x * other, self.y * other, self.z * other)
 
-    def dot(self, other): 
-        return self.x * other.x + self.y * other.y + self.z * other.z
-    
+    def __rmul__(self, other): 
+        if isinstance(other, Vector):
+            # dot multiple
+            return self.x * other.x + self.y * other.y + self.z * other.z
+        else:    
+            # scale
+            return Vector(self.x * other, self.y * other, self.z * other)
+
+    def __div__(self, other):
+        return Vector(self.x / other, self.y / other, self.z / other)
+
     def cross(self, other): 
         return Vector(self.y * other.z - self.z * other.y, self.z * other.x - self.x * other.z, self.x * other.y - self.y * other.x)
 
@@ -81,8 +104,7 @@ class Vector(object):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     def normalize(self): 
-        length = math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
-        return self.scalar(1.0 / self.length())
+        return self / self.length()
 
 
 class Ray:

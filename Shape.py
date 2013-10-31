@@ -1,5 +1,7 @@
 import math
 
+from Utility import Point
+
 class Shape:
     def get_material(self):
         pass
@@ -23,10 +25,10 @@ class Sphere(Shape):
         # o+td=c
         # (d*d)*t^2+[2(o-c)*d]*t+(o-c)*(o-c)-r^2=0
 
-        temp = ray.origin.substract(self.center)
-        a = ray.direction.dot(ray.direction)
-        b = 2.0 * temp.dot(ray.direction)
-        c = temp.dot(temp) - self.radius * self.radius
+        temp = ray.origin - self.center
+        a = ray.direction * ray.direction
+        b = 2.0 * temp * ray.direction
+        c = temp * temp - self.radius * self.radius
         discriminant = b * b - 4.0 * a * c
 
         if discriminant < 0.0:
@@ -37,9 +39,15 @@ class Sphere(Shape):
 
             if t > 0.001:
                 self.t = t
-                hit_point = ray.origin.move(ray.direction.scalar(self.t))
-                self.hit_point_normal = hit_point.substract(self.center).scalar(1.0 / self.radius) 
-                self.local_hit_point = hit_point.scalar(self.radius)
+                hit_point = ray.origin + (self.t * ray.direction)
+                self.hit_point_normal = (hit_point - self.center) / self.radius
+
+#                v2o = Vector(0.0, 0.0, 0.0) - self.center
+#                p2o = hit_point + v2o
+#                self.local_hit_point = p2o + (self.radius * (-1.0 * self.hit_point_normal))
+#                self.local_hit_point = hit_point + (self.radius * (-1.0 * self.hit_point_normal))
+#                print v2o, p2o, self.radius, self.hit_point_normal, self.local_hit_point
+                self.local_hit_point = Point(0.0, 0.0, 0.0) + self.hit_point_normal
                 return True
 
             e = math.sqrt(discriminant)
@@ -47,19 +55,24 @@ class Sphere(Shape):
 
             if t > 0.001:
                 self.t = t
-                hit_point = ray.origin.move(ray.direction.scalar(self.t))
-                self.hit_point_normal = hit_point.substract(self.center).scalar(1.0 / self.radius)
-                self.local_hit_point = hit_point.scalar(self.radius)
+                hit_point = ray.origin + (self.t * ray.direction)
+                self.hit_point_normal = (hit_point - self.center) / self.radius
+
+                v2o = Vector(0.0, 0.0, 0.0) - self.center
+                p2o = hit_point + v2o
+                self.local_hit_point = p2o + (self.radius * (-1.0 * self.hit_point_normal))
+#                self.local_hit_point = hit_point + (self.radius * (-1.0 * self.hit_point_normal))
+                self.local_hit_point = Point(0.0, 0.0, 0.0) + self.hit_point_normal
                 return True
 
     def shadow_hit(self, ray):
         if not self.block_light:
             return False
 
-        temp = ray.origin.substract(self.center)
-        a = ray.direction.dot(ray.direction)
-        b = 2.0 * temp.dot(ray.direction)
-        c = temp.dot(temp) - self.radius * self.radius
+        temp = ray.origin - self.center
+        a = ray.direction * ray.direction
+        b = 2.0 * temp * ray.direction
+        c = temp * temp - self.radius * self.radius
         discriminant = b * b - 4.0 * a * c
 
         if discriminant < 0.0:
@@ -91,11 +104,11 @@ class Plane:
         # (p - a) * n =0
         # (o + td -a) * n = 0
         # t = (a - o) * n / (d * n)
-        t = self.center.substract(ray.origin).dot(self.normal) / ray.direction.dot(self.normal)
+        t = (self.center -ray.origin) * self.normal / (ray.direction * self.normal)
         
         if t > 0.001:
             self.t = t
-            hit_point = ray.origin.move(ray.direction.scalar(self.t))
+            hit_point = ray.origin + (self.t * ray.direction)
             self.hit_point_normal = self.normal
             self.local_hit_point = hit_point
             return True
@@ -106,7 +119,7 @@ class Plane:
         if not self.block_light:
             return False
 
-        t = self.center.substract(ray.origin).dot(self.normal) / ray.direction.dot(self.normal)
+        t = (self.center - ray.origin) * self.normal / (ray.direction * (self.normal))
         
         if t > 0.001:
             self.shadow_t = t
