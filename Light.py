@@ -57,6 +57,28 @@ class AmbientOcclusion(Light):
         return False
 
 
+class PointLight(Light):
+    def __init__(self, ls, color, location, cast_shadow):
+        self.ls          = ls
+        self.color       = color
+        self.location    = location
+        self.cast_shadow = cast_shadow
+
+    def get_direction(self, shading_point):
+        self.distance = (shading_point.hit_point - self.location).length()
+        return shading_point.hit_point - self.location
+
+    def L(self):
+        return self.ls * self.color  / (self.distance * self.distance)
+
+    def in_shadow(self, ray, shading_point):
+        for shape in shading_point.scene.shapes:
+            if shape.shadow_hit(ray):
+                return True
+
+        return False
+
+
 class DirectionalLight(Light):
     def __init__(self, ls, color, direction, cast_shadow):
         self.ls          = ls
@@ -64,7 +86,7 @@ class DirectionalLight(Light):
         self.direction   = direction
         self.cast_shadow = cast_shadow
 
-    def get_direction(self):
+    def get_direction(self, shading_point):
         return self.direction
 
     def L(self):

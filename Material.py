@@ -14,7 +14,7 @@ class Matte(Material):
     def shade(self, shading_point):
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction() * -1.0
+            wi = light.get_direction(shading_point) * -1.0
             wi = wi.normalize()
             ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
@@ -24,8 +24,7 @@ class Matte(Material):
                     shadow_ray = Ray(shading_point.hit_point, wi)
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
-                    L = L + self.diffuse_brdf.f(shading_point) * light.L()
-                    L = L * ndotwi
+                    L = L + self.diffuse_brdf.f(shading_point) * light.L() * ndotwi
 
         return L
 
@@ -59,7 +58,7 @@ class Phong(Material):
         wo = wo.normalize()
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction() * -1.0
+            wi = light.get_direction(shading_point) * -1.0
             wi = wi.normalize()
             ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
@@ -69,8 +68,7 @@ class Phong(Material):
                     shadow_ray = Ray(shading_point.hit_point, wi)
                     in_shadow = light.in_shadow(shadow_ray, shading_point)
                 if not in_shadow:
-                    L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L()
-                    L = L * ndotwi
+                    L = L + (self.diffuse_brdf.f(shading_point) + self.specular_brdf.f(shading_point, wo, wi)) * light.L()  * ndotwi
 
         return L
 

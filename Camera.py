@@ -45,15 +45,17 @@ class PinholeCamera(Camera):
                     L = L + scene.tracer.trace_ray(ray_origin, ray_direction, ray_depth)
                 L = L / scene.view_plane.sampler.num_samples
 
-                # clamp to red
+                # clamp to >1.0 red, <0.0 green
                 if L.r > 1.0 or L.g > 1.0 or L.b > 1.0:
                     L = Color(1.0, 0.0, 0.0)
+                if L.r < 0.0 or L.g < 0.0 or L.b < 0.0:
+                    L = Color(0.0, 1.0, 0.0)
                 # Gamma Correction to 2.2
                 L = L.powc(1.0 / 2.2)
                 # color 0.0~1.0 to Image module's 0~255 color range
                 L = L * 255.0
                 # view plane coordinates to screen coordinates
-                pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
+                pixels[column, height - 1 - row] = (int(L.r + 0.5), int(L.g + 0.5), int(L.b + 0.5))
 #            print "Render {0:.2f}%".format(float(row + 1) / height * 100.0)
             sys.stdout.write("\r\x1b[K"+"Render {0:.2f}%".format(float(row + 1) / height * 100.0))
             sys.stdout.flush()

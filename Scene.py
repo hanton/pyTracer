@@ -60,7 +60,7 @@ class Scene:
         self.view_plane.pixel_size    = 0.1
 
         # Camera
-        eye = Point(0, 5, -150)
+        eye = Point(0, 5, 150)
         lookat = Point(0, 0, 0)
         up = Vector(0, 1, 0)
         viewplane_distance = 100
@@ -108,7 +108,7 @@ class Scene:
         ks    = 0.5
         color = Color(0.0, 1.0, 0.0)
         constant_color = ConstantColor(color)
-        exp   = 30.0
+        exp   = 50.0
         phong = Phong(ka, kd, ks, constant_color, exp)
         center = Point(-30.0, 0.0, -10.0)
         radius = 10.0
@@ -121,11 +121,18 @@ class Scene:
         self.ambient_light = AmbientLight(light_intensity, light_color)
 
         light_color     = Color(1.0, 1.0, 1.0)
-        light_direction = Vector(1.0, -1.0, 1.0)
-        light_intensity = 1.0
+        light_direction = Vector(0.1, -1.0, 1.0)
+        light_intensity = 0.05
         cast_shadow     = True
         direction_light = DirectionalLight(light_intensity, light_color, light_direction, cast_shadow)
         self.add_light(direction_light)
+
+        light_color     = Color(1.0, 1.0, 1.0)
+        light_location = Vector(0.0, 20.0, 0.0)
+        light_intensity = 0.95 * 500
+        cast_shadow     = True
+        point_light= PointLight(light_intensity, light_color, light_location, cast_shadow)
+        self.add_light(point_light)
 
     def ambient_occlusion(self, num_samples, num_sets):
         ka    = 0.5
