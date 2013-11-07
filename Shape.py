@@ -17,7 +17,7 @@ class Sphere(Shape):
     def __init__(self, center, radius, material, block_light):
         self.center      = center
         self.radius      = radius
-        self.material    = material
+        self.material    = material     
         self.block_light = block_light
 
     def hit(self, ray):
@@ -104,7 +104,11 @@ class Plane:
         # (p - a) * n =0
         # (o + td -a) * n = 0
         # t = (a - o) * n / (d * n)
-        t = (self.center -ray.origin) * self.normal / (ray.direction * self.normal)
+        temp = ray.direction * self.normal
+        if temp != 0.0:
+            t = (self.center -ray.origin) * self.normal / temp
+        else:
+            t = 0.0
         
         if t > 0.001:
             self.t = t
@@ -144,19 +148,19 @@ class Rectangle(Shape):
         self.inv_area = 1.0 / area
 
     def hit(self, ray):
-        t = self.p0.substract(ray.origin).dot(self.normal) / ray.direction.dot(self.normal)
+        t = (self.p0 - ray.origin) * self.normal / (ray.direction * self.normal)
         
         if t <= 0.001:
             return False
 
-        hit_point = ray.origin.move(ray.direction.scalar(t))
-        d = hit_point.substract(self.p0)
+        hit_point = ray.origin + t * ray.direction
+        d = hit_point - self.p0
 
-        ddota = d.dot(self.a)
+        ddota = d * self.a
         if ddota < 0.0 or ddota > self.a.length() * self.a.length():
             return False
 
-        ddotb = d.dot(self.b)
+        ddotb = d * self.b
         if ddotb < 0.0 or ddotb > self.b.length() * self.b.length():
             return False
             
@@ -167,7 +171,7 @@ class Rectangle(Shape):
 
     def sample(self):
         sample = self.sampler.sample_unit_square()
-        return (self.p0.move(self.a.scalar(sample.x) + self.b.scalar(sample.y)))
+        return (self.p0 + sample.x * self.a + sample.y * self.b)
 
     def pdf(self):
         return self.inv_area
@@ -176,19 +180,23 @@ class Rectangle(Shape):
         if not self.block_light:
             return False
 
-        t = self.p0.substract(ray.origin).dot(self.normal) / ray.direction.dot(self.normal)
-        
+        temp = ray.direction * self.normal
+        if temp != 0.0:
+            t = (self.p0 - ray.origin) * self.normal / (ray.direction * self.normal)
+        else:
+            t = 0.0
+
         if t <= 0.001:
             return False
 
-        hit_point = ray.origin.move(ray.direction.scalar(t))
-        d = hit_point.substract(self.p0)
+        hit_point = ray.origin + t * ray.direction
+        d = hit_point - self.p0
 
-        ddota = d.dot(self.a)
+        ddota = d * self.a
         if ddota < 0.0 or ddota > self.a.length() * self.a.length():
             return False
 
-        ddotb = d.dot(self.b)
+        ddotb = d * self.b
         if ddotb < 0.0 or ddotb > self.b.length() * self.b.length():
             return False
             

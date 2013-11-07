@@ -1,5 +1,5 @@
 import math
-from Utility import Color, Ray
+from Utility import Color, Ray, Vector
 
 class Material:
     def shade(self, shading_point):
@@ -7,9 +7,9 @@ class Material:
 
 
 class Matte(Material):
-    def __init__(self, ka, kd, cd):
+    def __init__(self, ka, kd, cd, sampler = None):
         self.ambient_brdf = Lambertian(ka, cd)
-        self.diffuse_brdf = Lambertian(kd, cd)
+        self.diffuse_brdf = Lambertian(kd, cd, sampler)
         
     def shade(self, shading_point):
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
@@ -31,9 +31,9 @@ class Matte(Material):
     def area_light_shade(self, shading_point):
         L = self.ambient_brdf.rho(shading_point) * shading_point.scene.ambient_light.L(shading_point)
         for light in shading_point.scene.lights:
-            wi = light.get_direction(shading_point).scalar(-1.0)
+            wi = -1.0 * light.get_direction(shading_point)
             wi = wi.normalize()
-            ndotwi = shading_point.normal.dot(wi)
+            ndotwi = shading_point.normal * wi
             if ndotwi > 0.0:
                 in_shadow = False
 
@@ -45,6 +45,13 @@ class Matte(Material):
                     L = L * ndotwi * light.G(shading_point) / light.pdf(shading_point)
 
         return L
+
+    def path_shade(self, shading_point):
+        pdf, wi, f  = self.diffuse_brdf.sample_f(shading_point)
+        ndotwi = shading_point.normal * wi
+        reflected_ray_origin = shading_point.hit_point
+        reflected_ray_dicrection = wi
+        return (f * shading_point.scene.tracer.trace_ray(reflected_ray_origin, reflected_ray_dicrection, shading_point.ray_depth + 1) * ndotwi / pdf)
 
 
 class Phong(Material):
@@ -112,6 +119,14 @@ class Reflective(Phong):
 
         return L
 
+    def path_shade(self, shading_point):
+        wo = -1.0 * shading_point.ray.direction
+        pdf, wi, fr = self.reflective_brdf.sample_f(shading_point, wo)
+        ndotwi = shading_point.normal * wi
+        reflected_ray = Ray(shading_point.hit_point, wi)
+
+        return (fr * shading_point.scene.tracer.trace_ray(reflected_ray, shading_point.depth + 1) * ndotwi / pdf)
+
 
 class Emissive(Material):
     def __init__(self, ls, ce):
@@ -121,13 +136,21 @@ class Emissive(Material):
     def area_light_shade(self, shading_point):
         wo = shading_point.ray.direction * -1.0
         wo = wo.normalize()  
-        if shading_point.normal.dot(wo) > 0.0:
-            return self.ce.scalar(self.ls) 
+        if shading_point.normal * wo > 0.0:
+            return self.ls * self.ce 
+        else:
+            return Color(0.0, 0.0, 0.0)
+
+    def path_shade(self, shading_point):
+        wo = shading_point.ray.direction * -1.0
+        wo = wo.normalize()  
+        if shading_point.normal * wo > 0.0:
+            return self.ls * self.ce 
         else:
             return Color(0.0, 0.0, 0.0)
     
     def Le(self):
-        return self.ce.scalar(self.ls)
+        return self.ls * self.ce
 
 
 class BRDF:
@@ -136,9 +159,12 @@ class BRDF:
 
 
 class Lambertian(BRDF):
-    def __init__(self, kd, surface):
-        self.kd = kd
+    def __init__(self, kd, surface, sampler = None):
+        self.kd      = kd
         self.surface = surface
+        if sampler != None:
+            self.sampler = sampler
+            self.sampler.map_samples_to_hemisphere(1)
 
     def rho(self, shading_point):
         color = self.surface.get_color(shading_point)
@@ -147,6 +173,20 @@ class Lambertian(BRDF):
     def f(self, shading_point):
         color = self.surface.get_color(shading_point)
         return (self.kd * color) / math.pi
+
+    def sample_f(self, shading_point):
+        w = shading_point.normal
+        # jitter the up vector
+        v = Vector(0.0024, 1.0, 0.0081).cross(w)
+        v = v.normalize()
+        u = v.cross(w)
+
+        sample_point = self.sampler.sample_hemisphere()
+        wi = sample_point.x * u + sample_point.y * v + sample_point.z * w
+        wi = wi.normalize()
+        pdf = shading_point.normal * wi / math.pi
+        color = self.surface.get_color(shading_point)
+        return pdf, wi, (self.kd * color / math.pi)
 
 
 class GlossySpecular(BRDF):
@@ -168,17 +208,17 @@ class GlossySpecular(BRDF):
 
 
 class PerfectSpecular(BRDF):
-    def __init__(self, kr, cr):
-        self.kr = kr
-        self.cr = cr
+    def __init__(self, kr, surface):
+        self.kr      = kr
+        self.surface = surface
 
     def sample_f(self, shading_point, wo):
-        ndotwo = shading_point.normal.dot(wo)
+        ndotwo = shading_point.normal * wo
         wi     = wo * -1.0 + shading_point.normal * (2.0 * ndotwo)
-        self.wi = wi
-        ndotwi = shading_point.normal * wi
-        return self.cr.scalar(self.kr / ndotwi)
-
+        pdf = shading_point.normal * wi
+        color = self.surface.get_color(shading_point)
+        return pdf, wi, (self.kr * color)
+        
 
 class Surface:
     def get_color(self, shading_point):

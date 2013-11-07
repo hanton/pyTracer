@@ -18,12 +18,14 @@ class Color:
     
     def __mul__(self, other): 
         if isinstance(other, Color):
+#        if type(other) == Color:
             return Color(self.r * other.r, self.g * other.g, self.b * other.b)
         else:
             return Color(self.r * other, self.g * other, self.b * other)
 
     def __rmul__(self, other): 
         if isinstance(other, Color):
+#        if type(other) == Color:
             return Color(self.r * other.r, self.g * other.g, self.b * other.b)
         else:
             return Color(self.r * other, self.g * other, self.b * other)
@@ -79,7 +81,8 @@ class Vector(object):
         return Vector(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __mul__(self, other):
-        if isinstance(other, Vector):
+#        if isinstance(other, Vector):
+        if type(other) == Vector:
             # dot multiple
             return self.x * other.x + self.y * other.y + self.z * other.z
         else:    
@@ -87,7 +90,8 @@ class Vector(object):
             return Vector(self.x * other, self.y * other, self.z * other)
 
     def __rmul__(self, other): 
-        if isinstance(other, Vector):
+#        if isinstance(other, Vector):
+        if type(other) == Vector:
             # dot multiple
             return self.x * other.x + self.y * other.y + self.z * other.z
         else:    
@@ -104,7 +108,8 @@ class Vector(object):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
     def normalize(self): 
-        return self / self.length()
+#        return self / self.length()
+        return self / math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
 
 class Ray:

@@ -20,6 +20,17 @@ How to Run
    python pyRayTracer                            - to render a default 640*320 with 4 pixel samples picture
 or python pyRayTracer width height pixel_samples - to render a width*height with num_samples pixel samples picture
 
+Use PyPy! it’s 80x faster:
+   pypy pyRayTracer                            - to render a default 640*320 with 4 pixel samples picture
+or pypy pyRayTracer width height pixel_samples - to render a width*height with num_samples pixel samples picture
+
+Profile:
+to Screen
+python -m cProfile -s time pyRayTracer <args>
+
+or to File:
+python -m cProfile -o output.file pyRayTracer <args>
+
 
 ===========
 Reference: 

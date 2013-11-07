@@ -1,5 +1,5 @@
-from PIL import Image
-import sys
+#from PIL import Image
+import sys, time
 from Utility import Color
 
 class Camera:
@@ -27,15 +27,17 @@ class PinholeCamera(Camera):
     def render(self, scene):
         width  = scene.view_plane.get_width()
         height = scene.view_plane.get_height()
-        picture = Image.new('RGB', (width, height))
-        pixels = picture.load()
+#        picture = Image.new('RGB', (width, height))
+#        pixels = picture.load()
+        pixels = []  # list
 
         ray_origin = self.eye
         
-        for row in range(0, height):
-            for column in range(0, width):
+#        for row in xrange(height):
+        for row in xrange(height, 0, -1):
+            for column in xrange(width):
                 L = Color(0.0, 0.0, 0.0)                
-                for j in range(0, scene.view_plane.sampler.num_samples):
+                for j in xrange(scene.view_plane.sampler.num_samples):
                     # sp range [0.0 ~ 1.0] [0.0 ~ 1.0]
                     sp = scene.view_plane.sampler.sample_unit_square()
                     px = scene.view_plane.pixel_size * (column - 0.5 * width + sp.x)
@@ -55,14 +57,18 @@ class PinholeCamera(Camera):
                 # color 0.0~1.0 to Image module's 0~255 color range
                 L = L * 255.0
                 # view plane coordinates to screen coordinates
-                pixels[column, height - 1 - row] = (int(L.r + 0.5), int(L.g + 0.5), int(L.b + 0.5))
-#            print "Render {0:.2f}%".format(float(row + 1) / height * 100.0)
-            sys.stdout.write("\r\x1b[K"+"Render {0:.2f}%".format(float(row + 1) / height * 100.0))
+#                pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
+                pixels.append((int(L.r), int(L.g), int(L.b)))
+#            sys.stdout.write("\r\x1b[K"+"Render {0:.2f}%".format(float(row + 1) / height * 100.0))
+            sys.stdout.write("\r\x1b[K"+"Remain {0:.2f}%".format(float(row - 1) / height * 100.0))
             sys.stdout.flush()
         
-        filename = "render.tiff"
-        picture.save(filename)
-        picture.show()
+#        filename = "render.tiff"        
+#        picture.save(filename)
+#        picture.show()
+
+        # ppm file
+        write_ppm("./Render/render" + str(time.time()) + ".ppm", width, height, pixels)
 
 
 class ThinLens(Camera):
@@ -74,3 +80,12 @@ class ThinLens(Camera):
 
     def render(self, scene):
         pass
+
+
+def write_ppm(filename, width, height, pixels):
+    with open(filename, 'wb') as f:
+        f.write('P6 %d %d 255\n' % (width, height))
+#        pixels.reverse()
+        for pixel in pixels:
+            f.write(chr(pixel[0]) + chr(pixel[1]) + chr(pixel[2]))
+        f.close()

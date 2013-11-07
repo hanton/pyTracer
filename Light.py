@@ -1,5 +1,5 @@
 import math
-from Utility import Vector, Ray
+from Utility import Vector, Color, Ray
 
 class Light:
     def get_direction(self):
@@ -32,11 +32,11 @@ class AmbientOcclusion(Light):
 
     def get_direction(self):
         sample = self.sampler.sample_hemisphere()
-        return (self.u.scalar(sample.x) + self.v.scalar(sample.y) + self.w.scalar(sample.z))
+        return (sample.x * self.u + sample.y * self.v + sample.z * self.w)
 
     def L(self, shading_point):
         self.w = shading_point.normal
-        # jitter up vector
+        # jitter the up vector
         up     = Vector(0.005, 1.0, 0.005)
         self.v = self.w.cross(up)
         self.v = self.v.normalize()
@@ -45,14 +45,14 @@ class AmbientOcclusion(Light):
         shadow_ray = Ray(shading_point.hit_point, self.get_direction())
 
         if self.in_shadow(shadow_ray, shading_point):
-            return self.color.scalar(self.ls * self.min_amount)
+            return self.ls * self.color * self.min_amount
         else:
-            return self.color.scalar(self.ls)
+            return self.ls * self.color
 
     def in_shadow(self, ray, shading_point): 
         for shape in shading_point.scene.shapes:
             if shape.shadow_hit(ray):
-                return True
+                    return True
 
         return False
 
@@ -74,7 +74,8 @@ class PointLight(Light):
     def in_shadow(self, ray, shading_point):
         for shape in shading_point.scene.shapes:
             if shape.shadow_hit(ray):
-                return True
+                if shape.shadow_t < (self.location - shading_point.hit_point).length():
+                    return True
 
         return False
 
@@ -112,12 +113,12 @@ class AreaLight(Light):
     def get_direction(self, shading_point):
         self.sample = self.shape.sample()
         self.light_normal = self.shape.normal
-        self.wi = self.sample.substract(shading_point.hit_point)
+        self.wi = self.sample - shading_point.hit_point
         self.wi = self.wi.normalize()
-        return self.wi.scalar(-1.0)
+        return -1.0 * self.wi
 
     def in_shadow(self, ray, shading_point):
-        ts = self.sample.substract(ray.origin).dot(ray.direction)
+        ts = (self.sample - ray.origin) * ray.direction
         for shape in shading_point.scene.shapes:
             if shape.shadow_hit(ray) and shape.shadow_t < ts:
                 return True
@@ -125,7 +126,7 @@ class AreaLight(Light):
         return False
 
     def L(self):
-        ndotd = self.light_normal.cross(self.wi)
+        ndotd = -1.0 * self.wi * self.light_normal
 
         if ndotd > 0.0:
             return self.shape.material.Le()
@@ -133,7 +134,7 @@ class AreaLight(Light):
             return Color(0.0, 0.0, 0.0)
 
     def G(self, shading_point):
-        ndotd = self.light_normal.scalar(-1.0).dot(self.wi)
+        ndotd = -1.0 * self.light_normal * self.wi
         d2    = self.sample.distance(shading_point.hit_point)
         d2    = d2 * d2
         return ndotd / d2
