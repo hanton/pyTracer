@@ -1,6 +1,6 @@
 GitHub: https://github.com/hanton/pyRayTracer
 
-pyRayTracer
+#pyRayTracer
 ===========
 
 pyRayTracer is a Ray Tracer in Python. I write it for learning speaking Python and Ray Tracing.
