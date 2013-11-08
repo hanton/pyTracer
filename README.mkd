@@ -38,4 +38,4 @@ or
 * LuxRender : http://www.luxrender.net
     
     
-GitHub: https://github.com/hanton/pyRayTracer
+GitHub: https://github.com/hanton/pypyRayTracer
