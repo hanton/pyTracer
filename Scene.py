@@ -258,9 +258,9 @@ class Scene:
         self.ambient_light = AmbientOcclusion(light_intensity, light_color, min_amount, sampler)
 
     def area_light_box(self, num_samples, num_sets):
-        height = 5.0
-        width  = 15.0
-        depth  = 15.0
+        height = 2.0
+        width  = 35.0
+        depth  = 35.0
         origin = Point(0.0, 100.0 - height / 2.0, 0.0)
 
         # Front
@@ -282,7 +282,7 @@ class Scene:
         intensity = 10.0
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
-        p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z + depth / 2.0)
+        p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
         a           = Vector(width, 0.0, 0.0)
         b           = Vector(0.0, 0.0, depth)
         sampler     = MultiJittered(num_samples, num_sets)
@@ -293,53 +293,53 @@ class Scene:
         area_light = AreaLight(rectangle, cast_shadow)
         self.add_light(area_light)
 
-#        # Left
-#        intensity = 10.0
-#        color     = Color(1.0, 1.0, 1.0)
-#        emissive  = Emissive(intensity, color)
-#        p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z + depth / 2.0)
-#        a           = Vector(0.0, 0.0, depth)
-#        b           = Vector(0.0, height, 0.0)
-#        sampler     = MultiJittered(num_samples, num_sets)
-#        block_light = False
-#        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
-#        self.add_shape(rectangle)
-#        cast_shadow = True
-#        area_light = AreaLight(rectangle, cast_shadow)
-#        self.add_light(area_light)
+        # Left
+        intensity = 10.0
+        color     = Color(1.0, 1.0, 1.0)
+        emissive  = Emissive(intensity, color)
+        p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
+        a           = Vector(0.0, 0.0, depth)
+        b           = Vector(0.0, height, 0.0)
+        sampler     = MultiJittered(num_samples, num_sets)
+        block_light = False
+        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        self.add_shape(rectangle)
+        cast_shadow = True
+        area_light = AreaLight(rectangle, cast_shadow)
+        self.add_light(area_light)
 
-#        # Right
-#        intensity = 10.0
-#        color     = Color(1.0, 1.0, 1.0)
-#        emissive  = Emissive(intensity, color)
-#        p0          = Point(origin.x + width / 2.0, origin.y + height / 2.0, origin.z - depth / 2.0)
-#        a           = Vector(0.0, 0.0, depth)
-#        b           = Vector(0.0, -height, 0.0)
-#        sampler     = MultiJittered(num_samples, num_sets)
-#        block_light = False
-#        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
-#        self.add_shape(rectangle)
-#        cast_shadow = True
-#        area_light = AreaLight(rectangle, cast_shadow)
-#        self.add_light(area_light)
+        # Right
+        intensity = 10.0
+        color     = Color(1.0, 1.0, 1.0)
+        emissive  = Emissive(intensity, color)
+        p0          = Point(origin.x + width / 2.0, origin.y + height / 2.0, origin.z - depth / 2.0)
+        a           = Vector(0.0, 0.0, depth)
+        b           = Vector(0.0, -height, 0.0)
+        sampler     = MultiJittered(num_samples, num_sets)
+        block_light = False
+        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        self.add_shape(rectangle)
+        cast_shadow = True
+        area_light = AreaLight(rectangle, cast_shadow)
+        self.add_light(area_light)
 
-#        # Back
-#        intensity = 10.0
-#        color     = Color(1.0, 1.0, 1.0)
-#        emissive  = Emissive(intensity, color)
-#        p0          = Point(origin.x + width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
-#        a           = Vector(-width, 0.0, 0.0)
-#        b           = Vector(0.0, height, 0.0)
-#        sampler     = MultiJittered(num_samples, num_sets)
-#        block_light = False
-#        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
-#        self.add_shape(rectangle)
-#        cast_shadow = True
-#        area_light = AreaLight(rectangle, cast_shadow)
-#        self.add_light(area_light)
+        # Back
+        intensity = 10.0
+        color     = Color(1.0, 1.0, 1.0)
+        emissive  = Emissive(intensity, color)
+        p0          = Point(origin.x + width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
+        a           = Vector(-width, 0.0, 0.0)
+        b           = Vector(0.0, height, 0.0)
+        sampler     = MultiJittered(num_samples, num_sets)
+        block_light = False
+        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        self.add_shape(rectangle)
+        cast_shadow = True
+        area_light = AreaLight(rectangle, cast_shadow)
+        self.add_light(area_light)
 
     def area_lighting(self, num_samples, num_sets):
-        # 1280 * 720
+        # 740 * 740
         self.view_plane.pixel_size    = 0.09
 
 #        # 640 * 320

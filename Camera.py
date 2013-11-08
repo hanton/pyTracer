@@ -1,4 +1,5 @@
 #from PIL import Image
+import pdb # for debug
 import sys, time
 from Utility import Color
 
@@ -34,7 +35,7 @@ class PinholeCamera(Camera):
         ray_origin = self.eye
         
 #        for row in xrange(height):
-        for row in xrange(height, 0, -1):
+        for row in xrange(height - 1, -1, -1):
             for column in xrange(width):
                 L = Color(0.0, 0.0, 0.0)                
                 for j in xrange(scene.view_plane.sampler.num_samples):
@@ -44,12 +45,15 @@ class PinholeCamera(Camera):
                     py = scene.view_plane.pixel_size * (row - 0.5 * height + sp.y) 
                     ray_direction = self.ray_direction(px, py)
                     ray_depth = 0
+#                    if row == height - 2 and column == 0:
+#                        pdb.set_trace()
                     L = L + scene.tracer.trace_ray(ray_origin, ray_direction, ray_depth)
                 L = L / scene.view_plane.sampler.num_samples
 
                 # clamp to >1.0 red, <0.0 green
                 if L.r > 1.0 or L.g > 1.0 or L.b > 1.0:
-                    L = Color(1.0, 0.0, 0.0)
+#                    L = Color(1.0, 0.0, 0.0)
+                    L = Color(1.0, 1.0, 1.0)                    
                 if L.r < 0.0 or L.g < 0.0 or L.b < 0.0:
                     L = Color(0.0, 1.0, 0.0)
                 # Gamma Correction to 2.2
@@ -60,7 +64,7 @@ class PinholeCamera(Camera):
 #                pixels[column, height - 1 - row] = (int(L.r), int(L.g), int(L.b))
                 pixels.append((int(L.r), int(L.g), int(L.b)))
 #            sys.stdout.write("\r\x1b[K"+"Render {0:.2f}%".format(float(row + 1) / height * 100.0))
-            sys.stdout.write("\r\x1b[K"+"Remain {0:.2f}%".format(float(row - 1) / height * 100.0))
+            sys.stdout.write("\r"+"Remain {0:.2f}%".format(float(row) / height * 100.0))
             sys.stdout.flush()
         
 #        filename = "render.tiff"        
