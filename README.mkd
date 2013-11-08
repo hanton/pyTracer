@@ -24,8 +24,8 @@ or
 
 ##Reference: 
 * Ray Tracing from the Ground Up by Kevin Suffern
-* Physically Based Rendering, Second Edition: From Theory To Implementation by Matt Pharr, Greg Humphreys
-* Advanced Global Illumination, Second Edition by Philip Dutre, Philippe Bekaert and Kavita Bala
+* Physically Based Rendering: From Theory To Implementation by Matt Pharr, Greg Humphreys
+* Advanced Global Illumination by Philip Dutre, Philippe Bekaert and Kavita Bala
 * Mitsuba Renderer : http://www.mitsuba-renderer.org
 * LuxRender : http://www.luxrender.net
     
