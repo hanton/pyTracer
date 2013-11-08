@@ -1,6 +1,6 @@
-#pypyRayTracer - a Ray Tracer in PyPy
+##pypyRayTracer - a Ray Tracer in PyPy
 
-###Vision -> Physical Theory -> Mathematical Model -> Python -> Screen Pixels
+####Vision -> Physical Theory -> Mathematical Model -> Python -> Screen Pixels
 
 ##Features
 ##### * Camera : `Pinhole Camera`
@@ -25,6 +25,7 @@ or
 ##Reference: 
 * Ray Tracing from the Ground Up by Kevin Suffern
 * Physically Based Rendering, Second Edition: From Theory To Implementation by Matt Pharr, Greg Humphreys
+* Advanced Global Illumination, Second Edition by Philip Dutre, Philippe Bekaert and Kavita Bala
 * Mitsuba Renderer : http://www.mitsuba-renderer.org
 * LuxRender : http://www.luxrender.net
     
