@@ -12,6 +12,14 @@
 ##### * `Shadow`
 ##### * Geometry: `Sphere`, `Plane`, `Rectangle`
 
+##Examples
+####Direction Illumination
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Direction%20Illumination_16.png?raw=true)
+####Ambient Occlusion
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Ambient%20Occlusion.png?raw=true)
+####Area Light
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light.png?raw=true)
+
 ##How to Run
 #####`pypy pyRayTracer` - to render a default 640*320 with 4 pixel samples picture
 or 
