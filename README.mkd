@@ -1,6 +1,6 @@
 ##pypyRayTracer - a Ray Tracer in PyPy
 
-####Vision -> Physical Theory -> Mathematical Model -> Python -> Screen Pixels
+####Vision -> Physics(Radiometry) -> Mathematical Model -> Python -> Screen Pixels
 
 ##Features
 ##### * Camera : `Pinhole Camera`
