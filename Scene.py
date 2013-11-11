@@ -262,9 +262,10 @@ class Scene:
         width  = 35.0
         depth  = 35.0
         origin = Point(0.0, 100.0 - height / 2.0, 0.0)
+        light_intensity = 10.0
 
         # Front
-        intensity = 10.0
+        intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
         p0          = Point(origin.x + width / 2.0, origin.y + height / 2.0, origin.z + depth / 2.0)
@@ -279,7 +280,7 @@ class Scene:
         self.add_light(area_light)
 
         # Ground
-        intensity = 10.0
+        intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
         p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
@@ -294,7 +295,7 @@ class Scene:
         self.add_light(area_light)
 
         # Left
-        intensity = 10.0
+        intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
         p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
@@ -309,7 +310,7 @@ class Scene:
         self.add_light(area_light)
 
         # Right
-        intensity = 10.0
+        intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
         p0          = Point(origin.x + width / 2.0, origin.y + height / 2.0, origin.z - depth / 2.0)
@@ -324,7 +325,7 @@ class Scene:
         self.add_light(area_light)
 
         # Back
-        intensity = 10.0
+        intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
         emissive  = Emissive(intensity, color)
         p0          = Point(origin.x + width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
@@ -373,7 +374,7 @@ class Scene:
 
         ka    = 0.0
         kd    = 1.0
-        color = Color(0.0, 0.0, 1.0)
+        color = Color(1.0, 0.5, 0.0)
         constant_color = ConstantColor(color)
         matte = Matte(ka, kd, constant_color)
         radius = 15.0
@@ -518,40 +519,63 @@ class Scene:
         self.add_light(direction_light)
 
     def path_tracing(self, num_samples, num_sets):
-        self.view_plane.pixel_size    = 0.1
         self.view_plane.max_ray_depth = 1
+        # 740 * 740
+        self.view_plane.pixel_size    = 0.09
+
+#        # 640 * 320
+#        self.view_plane.pixel_size    = 0.2
 
         # Camera
-        eye = Point(0, 5, 150)
-        lookat = Point(0, 0, 0)
+        eye = Point(0, 50, 200)
+        lookat = Point(0, 50, 50)
         up = Vector(0, 1, 0)
         viewplane_distance = 100
         self.camera = PinholeCamera(eye, lookat, up, viewplane_distance)
         self.camera.compute_uvw()
 
+        self.cornell_box()
+        self.area_light_box(num_samples, num_sets)
+
+
+#        image             = Image.open("earthmap1k.jpg")
+#        texels            = image.load()
+#        image_width, image_height = image.size
+#        spherical_mapping = SphericalMapping()
+#        texture           = ImageTexture(texels, spherical_mapping, image_width, image_height)
+#        ka                = 0.0
+#        kd                = 1.0
+#        matte             = Matte(ka, kd, texture)
+#        radius = 20.0
+#        center = Point(25.0, radius, -20.0)
+#        block_light = True        
+#        sphere = Sphere(center, radius, matte, block_light)
+#        self.add_shape(sphere)
+
         ka    = 0.0
         kd    = 1.0
         color = Color(0.0, 0.0, 1.0)
         constant_color = ConstantColor(color)
-        sampler     = MultiJittered(num_samples, num_sets)
-        matte = Matte(ka, kd, constant_color, sampler)
-        center = Point(0.0, 0.0, -10.0)
-        radius = 10.0
+        matte = Matte(ka, kd, constant_color)
+        radius = 15.0
+        center = Point(-25.0, radius, 0.0)
         block_light = True
         sphere = Sphere(center, radius, matte, block_light)
         self.add_shape(sphere)
 
         ka    = 0.0
-        kd    = 1.0
-        color = Color(0.6, 0.6, 0.6)
+        kd    = 0.7
+        ks    = 0.3
+        color = Color(0.0, 1.0, 0.0)
         constant_color = ConstantColor(color)
-        sampler     = MultiJittered(num_samples, num_sets)
-        matte = Matte(ka, kd, constant_color, sampler)
-        center = Point(0.0, -10.0, 0.0)
-        normal = Vector(0.0, 1.0, 0.0)
+        exp   = 80.0
+        phong = Phong(ka, kd, ks, constant_color, exp)
+        radius = 10.0
+        center = Point(10.0, radius, 20.0)
         block_light = True
-        plane = Plane(center, normal, matte, block_light)
-        self.add_shape(plane)
+        sphere = Sphere(center, radius, phong, block_light)
+        self.add_shape(sphere)
+
         
         intensity = 1.0
         color     = Color(1.0, 1.0, 1.0)

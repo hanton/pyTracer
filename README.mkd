@@ -11,6 +11,7 @@
 ##### * `Ambient Occlusion`
 ##### * `Shadow`
 ##### * Geometry: `Sphere`, `Plane`, `Rectangle`
+##### * Tone Mapping: `Ward Contrast-based Linear Scale`, `Reinhard Spatially Varying Nonlinear Scale`
 
 ##Examples
 ####Direction Illumination
