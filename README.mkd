@@ -1,4 +1,4 @@
-##pypyRayTracer - a Ray Tracer in PyPy
+##pyTracer - a Ray Tracer in Python
 
 ####Vision -> Physics (radiometry) -> Mathematical Model -> Python -> Screen Pixels
 
@@ -39,4 +39,4 @@ or
 * LuxRender : http://www.luxrender.net
     
     
-GitHub: https://github.com/hanton/pypyRayTracer
+GitHub: https://github.com/hanton/pyTracer
