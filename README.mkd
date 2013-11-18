@@ -15,19 +15,25 @@
 
 ##Examples
 ####Direction Illumination
-![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Direction%20Illumination_16.png?raw=true)
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Direction%20Illumination.png?raw=true)
 ####Ambient Occlusion
 ![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Ambient%20Occlusion.png?raw=true)
-####Area Light
+####Area Light without Tone Mapping
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light without Tone Mapping.png?raw=true)
+####Area Light with Tone Mapping
+( Erik Reinhard, Mike Stark, Peter Shirley and Jim Ferwerda, 'Photographic Tone Reproduction for Digital Images', ACM Transactions on Graphics, 21(3), pp 267--276, July 2002 (Proceedings of SIGGRAPH 2002).)
 ![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light.png?raw=true)
+####Area Light with Blooming Effect and Tone Mapping
+(K. Chiu, M. Herf, P. Shirley, S. Swamy, C. Wang, and K. Zimmerman. Spatially nonuniform scaling functions for high contrast images. In Proceedings of Graphics Interface '93, pages 245--253, 1993.)
+![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light with Blooming Effect.png?raw=true)
 
 ##How to Run
-#####`pypy pyRayTracer` - to render a default 640*320 with 4 pixel samples picture
+#####`pypy pyRayTracer` - to render a default 740*740 with 1 pixel samples picture
 or 
 #####`pypy pyRayTracer width height pixel_samples` - to render a width*height with number pixel samples picture
 #####
 If you have not installed PyPy, Python is still OK, but a lot slower...
-#####`python pyRayTracer` - to render a default 640*320 with 4 pixel samples picture
+#####`python pyRayTracer` - to render a default 740*740 with 1 pixel samples picture
 or 
 #####`python pyRayTracer width height pixel_samples` - to render a width*height with number pixel samples picture
 
