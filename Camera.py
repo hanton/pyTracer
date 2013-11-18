@@ -1,7 +1,7 @@
 #from PIL import Image
 import pdb # for debug
 import sys, time
-from math import log10
+from math import log10, sqrt
 from Utility import Color
 
 class Camera:
@@ -72,6 +72,10 @@ class PinholeCamera(Camera):
 #        picture.save(filename)
 #        picture.show()
 
+#        # Bloom Effect
+#        pixels = blooming_effect(pixels, width, height)
+
+        # Tone Mapping
 #        tone_mapping_scalar = linear_tone_mapping(pixels)
 #        print tone_mapping_scalar
         pixels = nonlinear_tone_mapping(pixels)
@@ -103,6 +107,60 @@ class ThinLens(Camera):
     def render(self, scene):
         pass
 
+    
+# Apply Bloom Filter
+# K. Chiu, M. Herf, P. Shirley, S. Swamy, C. Wang, and K. Zimmerman. Spatially nonuniform scaling functions for high contrast images. In Proceedings of Graphics Interface '93, pages 245--253, 1993.
+def blooming_effect(pixels, width, height):
+    bloom_radius = 0.05
+    bloom_weight = 0.2
+    bloom_exp = 6.0
+    if bloom_radius > 0.0 and bloom_weight > 0.0:
+        bloom_width = int(bloom_radius * max(width, height)) / 2
+        # Initialize Bloom Filter List
+        bloom_filter = []
+        for i in xrange(bloom_width * bloom_width):
+            dist = sqrt(float(i)) / float(bloom_width)
+            bloom_filter_value = pow(max(0.0, 1.0 - dist), bloom_exp)
+            bloom_filter.append(bloom_filter_value)
+        # Apply Bloom Filter to Image Pixels
+        bloom_image = []
+        for i in xrange(len(pixels)):
+            bloom_image.append(Color(0.0, 0.0, 0.0))
+        bloom_x_start = 220 #0
+        bloom_x_end   = 500 #width
+        bloom_y_start = height - 700 #0
+        bloom_y_end   = height - 580 #height
+        for y in xrange(bloom_y_start, bloom_y_end):
+            sys.stdout.write("\r"+"Blooming Effect Remain {0:.2f}%".format(float(y) / (bloom_y_end - bloom_y_start) * 100.0))
+            sys.stdout.flush()
+            for x in xrange(bloom_x_start, bloom_x_end):
+                x0 = max(0, x - bloom_width)
+                x1 = min(x + bloom_width, width - 1)
+                y0 = max(0, y - bloom_width)
+                y1 = min(y + bloom_width, height - 1)
+                offset = y * width + x
+                sum_weight = 0.0
+                bx , by = x0, y0
+                for by in xrange(y1):
+                    for bx in xrange(x1):
+                        dx = x - bx
+                        dy = y - by
+                        if dx == 0 and dy == 0:
+                            continue
+                        dist2 = dx * dx + dy * dy
+                        if dist2 < bloom_width * bloom_width:
+                            bloom_offset = by * width + bx
+                            weight = bloom_filter[dist2]
+                            sum_weight += weight
+                            bloom_image[offset] += pixels[bloom_offset] * weight
+                bloom_image[offset] = bloom_image[offset] / sum_weight
+            
+    for y in xrange(bloom_y_start, bloom_y_end):
+        for x in xrange(bloom_x_start, bloom_x_end):
+            offset = y * width + x
+            pixels[offset] = bloom_image[offset] * bloom_weight + pixels[offset] * (1.0 - bloom_weight)
+    return pixels
+
 # Contrast-based Linear Scale
 # Ward, Greg, A Contrast-Based Scalefactor for Luminance Display, Graphics Gems IV, p. 415-421.
 def linear_tone_mapping(pixels):
@@ -120,7 +178,7 @@ def linear_tone_mapping(pixels):
 # Spatially Varying Nonlinear Scale
 # Erik Reinhard, Mike Stark, Peter Shirley and Jim Ferwerda, 'Photographic Tone Reproduction for Digital Images', ACM Transactions on Graphics, 21(3), pp 267--276, July 2002 (Proceedings of SIGGRAPH 2002).
 def nonlinear_tone_mapping(pixels):
-    max_y = 0.0
+    max_y = 0.01
     for pixel in pixels:
         # RGB Luminance is (0.2126,0.7152,0.0722)
         y = pixel.r * 0.2126 + pixel.g * 0.7152 + pixel.b * 0.0722
@@ -137,7 +195,6 @@ def nonlinear_tone_mapping(pixels):
 def write_ppm(filename, width, height, pixels):
     with open(filename, 'wb') as f:
         f.write('P6 %d %d 255\n' % (width, height))
-# pixels.reverse()
         for pixel in pixels:
             f.write(chr(int(pixel.r)) + chr(int(pixel.g)) + chr(int(pixel.b)))
         f.close()

@@ -1,5 +1,5 @@
 #from PIL import Image
-
+from math import exp, sin, cos
 from ViewPlane import * 
 from Utility import *
 from Shape import *
@@ -36,6 +36,7 @@ class Scene:
         
         self.tracer = AreaLighting(self)
         self.area_lighting(num_samples, num_sets)
+#        self.box_light(num_samples, num_sets)        
 
 #        self.tracer = Whitted(self)
 #        self.perfect_specular(num_samples, num_sets)
@@ -60,7 +61,7 @@ class Scene:
         return shading_point
 
     # Cornell Box
-    def cornell_box(self):
+    def cornell_box(self, sampler = None):
         height = 100.0
         width  = 100.0
         depth  = 100.0
@@ -71,14 +72,12 @@ class Scene:
         kd    = 1.0
         color = Color(1.0, 1.0, 0.0)
         constant_color = ConstantColor(color)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         matte = Matte(ka, kd, constant_color, sampler)
         p0          = Point(origin.x - width / 2.0, origin.y + height / 2.0, origin.z - depth / 2.0)
         a           = Vector(width, 0.0, 0.0)
         b           = Vector(0.0, 0.0, depth)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         block_light = True
-        rectangle = Rectangle(p0, a, b, matte, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, matte, block_light)
         self.add_shape(rectangle)
 
         # Ground
@@ -86,14 +85,12 @@ class Scene:
         kd    = 1.0
         color = Color(0.0, 1.0, 1.0)
         constant_color = ConstantColor(color)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         matte = Matte(ka, kd, constant_color, sampler)
         p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z + depth / 2.0)
         a           = Vector(width, 0.0, 0.0)
         b           = Vector(0.0, 0.0, -depth)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         block_light = True
-        rectangle = Rectangle(p0, a, b, matte, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, matte, block_light)
         self.add_shape(rectangle)
 
         # Left
@@ -101,14 +98,12 @@ class Scene:
         kd    = 1.0
         color = Color(1.0, 0.0, 0.0)
         constant_color = ConstantColor(color)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         matte = Matte(ka, kd, constant_color, sampler)
         p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z + depth / 2.0)
         a           = Vector(0.0, 0.0, -depth)
         b           = Vector(0.0, height, 0.0)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         block_light = True
-        rectangle = Rectangle(p0, a, b, matte, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, matte, block_light)
         self.add_shape(rectangle)
 
         # Right
@@ -116,14 +111,12 @@ class Scene:
         kd    = 1.0
         color = Color(0.0, 1.0, 0.0)
         constant_color = ConstantColor(color)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         matte = Matte(ka, kd, constant_color, sampler)
         p0          = Point(origin.x + width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
         a           = Vector(0.0, 0.0, depth)
         b           = Vector(0.0, height, 0.0)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         block_light = True
-        rectangle = Rectangle(p0, a, b, matte, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, matte, block_light)
         self.add_shape(rectangle)
 
         # Back
@@ -131,18 +124,16 @@ class Scene:
         kd    = 1.0
         color = Color(3.0, 3.0, 3.0)
         constant_color = ConstantColor(color)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         matte = Matte(ka, kd, constant_color, sampler)
         p0          = Point(origin.x - width / 2.0, origin.y - height / 2.0, origin.z - depth / 2.0)
         a           = Vector(width, 0.0, 0.0)
         b           = Vector(0.0, height, 0.0)
-        sampler     = None #MultiJittered(num_samples, num_sets)
         block_light = True
-        rectangle = Rectangle(p0, a, b, matte, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, matte, block_light)
         self.add_shape(rectangle)
 
     def diffuse_specular_texture_directionlight_shadow(self):
-        # 1280 * 720
+        # 740 * 740
         self.view_plane.pixel_size    = 0.09
 
 #        # 640 * 320
@@ -257,13 +248,7 @@ class Scene:
         sampler         = MultiJittered(num_samples, num_sets)
         self.ambient_light = AmbientOcclusion(light_intensity, light_color, min_amount, sampler)
 
-    def area_light_box(self, num_samples, num_sets):
-        height = 2.0
-        width  = 35.0
-        depth  = 35.0
-        origin = Point(0.0, 100.0 - height / 2.0, 0.0)
-        light_intensity = 10.0
-
+    def area_light_box(self, height, width, depth, origin, light_intensity, num_samples, num_sets):
         # Front
         intensity = light_intensity
         color     = Color(1.0, 1.0, 1.0)
@@ -273,7 +258,7 @@ class Scene:
         b           = Vector(0.0, -height, 0.0)
         sampler     = MultiJittered(num_samples, num_sets)
         block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, emissive, block_light, sampler)
         self.add_shape(rectangle)
         cast_shadow = True
         area_light = AreaLight(rectangle, cast_shadow)
@@ -288,7 +273,7 @@ class Scene:
         b           = Vector(0.0, 0.0, depth)
         sampler     = MultiJittered(num_samples, num_sets)
         block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, emissive, block_light, sampler)
         self.add_shape(rectangle)
         cast_shadow = True
         area_light = AreaLight(rectangle, cast_shadow)
@@ -303,7 +288,7 @@ class Scene:
         b           = Vector(0.0, height, 0.0)
         sampler     = MultiJittered(num_samples, num_sets)
         block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, emissive, block_light, sampler)
         self.add_shape(rectangle)
         cast_shadow = True
         area_light = AreaLight(rectangle, cast_shadow)
@@ -318,7 +303,7 @@ class Scene:
         b           = Vector(0.0, -height, 0.0)
         sampler     = MultiJittered(num_samples, num_sets)
         block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, emissive, block_light, sampler)
         self.add_shape(rectangle)
         cast_shadow = True
         area_light = AreaLight(rectangle, cast_shadow)
@@ -333,7 +318,7 @@ class Scene:
         b           = Vector(0.0, height, 0.0)
         sampler     = MultiJittered(num_samples, num_sets)
         block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+        rectangle = Rectangle(p0, a, b, emissive, block_light, sampler)
         self.add_shape(rectangle)
         cast_shadow = True
         area_light = AreaLight(rectangle, cast_shadow)
@@ -355,22 +340,13 @@ class Scene:
         self.camera.compute_uvw()
 
         self.cornell_box()
-        self.area_light_box(num_samples, num_sets)
 
-
-#        image             = Image.open("earthmap1k.jpg")
-#        texels            = image.load()
-#        image_width, image_height = image.size
-#        spherical_mapping = SphericalMapping()
-#        texture           = ImageTexture(texels, spherical_mapping, image_width, image_height)
-#        ka                = 0.0
-#        kd                = 1.0
-#        matte             = Matte(ka, kd, texture)
-#        radius = 20.0
-#        center = Point(25.0, radius, -20.0)
-#        block_light = True        
-#        sphere = Sphere(center, radius, matte, block_light)
-#        self.add_shape(sphere)
+        height = 2.0
+        width  = 35.0
+        depth  = 35.0
+        origin = Point(0.0, 100.0 - height / 2.0, 0.0)
+        light_intensity = 10.0
+        self.area_light_box(height, width, depth, origin, light_intensity, num_samples, num_sets)
 
         ka    = 0.0
         kd    = 1.0
@@ -408,6 +384,63 @@ class Scene:
         light_color     = Color(1.0, 1.0, 1.0)
         light_intensity    = 0.0
         self.ambient_light = AmbientLight(light_intensity, light_color)        
+
+    def box_light(self, num_samples, num_sets):
+        # 1280 * 720
+        self.view_plane.pixel_size    = 0.2
+
+#        # 640 * 320
+#        self.view_plane.pixel_size    = 0.2
+
+        # Camera
+        eye = Point(0, 50, 200)
+        lookat = Point(0, 50, 50)
+        up = Vector(0, 1, 0)
+        viewplane_distance = 100
+        self.camera = PinholeCamera(eye, lookat, up, viewplane_distance)
+        self.camera.compute_uvw()
+
+        height = 20.0
+        width  = 20.0
+        depth  = 20.0
+        origin = Point(0.0, 100, 0.0)
+        light_intensity = 10.0
+        self.area_light_box(height, width, depth, origin, light_intensity, num_samples, num_sets)
+
+        ka    = 0.0
+        kd    = 1.0
+        color = Color(1.0, 0.5, 0.0)
+        constant_color = ConstantColor(color)
+        matte = Matte(ka, kd, constant_color)
+        radius = 3.0
+        block_light = True
+        # Golden Spiral
+        a = 2.0
+        b = 1.0
+        t = 0.0
+        for i in xrange(50):
+            px = a * exp(b * t) * cos(t)
+            pz = a * exp(b * t) * sin(t)
+            print px, pz
+            center = Point(px, radius, pz)
+            sphere = Sphere(center, radius, matte, block_light)
+            self.add_shape(sphere)
+            t += 0.1
+
+        ka    = 0.0
+        kd    = 1.0
+        color = Color(0.6, 0.6, 0.6)
+        constant_color = ConstantColor(color)        
+        matte = Matte(ka, kd, constant_color)
+        center = Point(0.0, 0.0, 0.0)
+        normal = Vector(0.0, 1.0, 0.0)
+        block_light = True
+        plane = Plane(center, normal, matte, block_light)
+        self.add_shape(plane)
+
+        light_color     = Color(1.0, 1.0, 1.0)
+        light_intensity    = 0.0
+        self.ambient_light = AmbientLight(light_intensity, light_color)
 
     def perfect_specular(self, num_samples, num_sets):
         self.view_plane.max_ray_depth = 2
@@ -519,7 +552,7 @@ class Scene:
         self.add_light(direction_light)
 
     def path_tracing(self, num_samples, num_sets):
-        self.view_plane.max_ray_depth = 1
+        self.view_plane.max_ray_depth = 2
         # 740 * 740
         self.view_plane.pixel_size    = 0.09
 
@@ -534,59 +567,52 @@ class Scene:
         self.camera = PinholeCamera(eye, lookat, up, viewplane_distance)
         self.camera.compute_uvw()
 
-        self.cornell_box()
+        sampler = MultiJittered(num_samples, num_sets)
+        self.cornell_box(sampler)
         self.area_light_box(num_samples, num_sets)
-
-
-#        image             = Image.open("earthmap1k.jpg")
-#        texels            = image.load()
-#        image_width, image_height = image.size
-#        spherical_mapping = SphericalMapping()
-#        texture           = ImageTexture(texels, spherical_mapping, image_width, image_height)
-#        ka                = 0.0
-#        kd                = 1.0
-#        matte             = Matte(ka, kd, texture)
-#        radius = 20.0
-#        center = Point(25.0, radius, -20.0)
-#        block_light = True        
-#        sphere = Sphere(center, radius, matte, block_light)
-#        self.add_shape(sphere)
 
         ka    = 0.0
         kd    = 1.0
         color = Color(0.0, 0.0, 1.0)
         constant_color = ConstantColor(color)
-        matte = Matte(ka, kd, constant_color)
+        sampler = MultiJittered(num_samples, num_sets)        
+        matte = Matte(ka, kd, constant_color, sampler)
         radius = 15.0
         center = Point(-25.0, radius, 0.0)
         block_light = True
         sphere = Sphere(center, radius, matte, block_light)
         self.add_shape(sphere)
 
-        ka    = 0.0
-        kd    = 0.7
-        ks    = 0.3
-        color = Color(0.0, 1.0, 0.0)
-        constant_color = ConstantColor(color)
-        exp   = 80.0
-        phong = Phong(ka, kd, ks, constant_color, exp)
-        radius = 10.0
-        center = Point(10.0, radius, 20.0)
-        block_light = True
-        sphere = Sphere(center, radius, phong, block_light)
-        self.add_shape(sphere)
+#        ka    = 0.0
+#        kd    = 0.7
+#        ks    = 0.3
+#        color = Color(0.0, 1.0, 0.0)
+#        constant_color = ConstantColor(color)
+#        exp   = 80.0
+#        sampler     = MultiJittered(num_samples, num_sets)        
+#        phong = Phong(ka, kd, ks, constant_color, exp, sampler)
+#        radius = 10.0
+#        center = Point(10.0, radius, 20.0)
+#        block_light = True
+#        sphere = Sphere(center, radius, phong, block_light)
+#        self.add_shape(sphere)
+
+        # Ambient Light
+        light_color     = Color(1.0, 1.0, 1.0)
+        light_intensity    = 0.0
+        self.ambient_light = AmbientLight(light_intensity, light_color)
 
         
-        intensity = 1.0
-        color     = Color(1.0, 1.0, 1.0)
-        emissive  = Emissive(intensity, color)
-        p0          = Point(-40.0, 12.0, 0.0)
-        a           = Vector(0.0, 0.0, -10.0)
-        b           = Vector(5.0, 10.0, 0.0)
-        sampler     = MultiJittered(num_samples, num_sets)
-        block_light = False
-        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
-        self.add_shape(rectangle)
-        cast_shadow = True
-        area_light = AreaLight(rectangle, cast_shadow)
-        self.add_light(area_light)
+#        intensity = 1.0
+#        color     = Color(1.0, 1.0, 1.0)
+#        emissive  = Emissive(intensity, color)
+#        p0          = Point(-40.0, 12.0, 0.0)
+#        a           = Vector(0.0, 0.0, -10.0)
+#        b           = Vector(5.0, 10.0, 0.0)
+#        sampler     = MultiJittered(num_samples, num_sets)
+#        block_light = False
+#        rectangle = Rectangle(p0, a, b, emissive, sampler, block_light)
+#        self.add_shape(rectangle)
+#        cast_shadow = True
+#        area_light = AreaLight(rectangle, cast_shadow)
+#        self.add_light(area_light)

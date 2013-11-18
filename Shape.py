@@ -133,7 +133,7 @@ class Plane:
 
 
 class Rectangle(Shape):
-    def __init__(self, p0, a, b, material, sampler, block_light):
+    def __init__(self, p0, a, b, material, block_light, sampler = None):
         self.p0          = p0
         self.a           = a
         self.b           = b

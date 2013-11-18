@@ -46,11 +46,15 @@ class Matte(Material):
         return L
 
     def path_shade(self, shading_point):
+        L = Color(0.0, 0.0, 0.0)
+        if shading_point.ray_depth == 0:
+            L = self.area_light_shade(shading_point)
         pdf, wi, f  = self.diffuse_brdf.sample_f(shading_point)
         ndotwi = shading_point.normal * wi
         reflected_ray_origin = shading_point.hit_point
         reflected_ray_dicrection = wi
-        return (f * shading_point.scene.tracer.trace_ray(reflected_ray_origin, reflected_ray_dicrection, shading_point.ray_depth + 1) * ndotwi / pdf)
+        L += (f * shading_point.scene.tracer.trace_ray(reflected_ray_origin, reflected_ray_dicrection, shading_point.ray_depth + 1) * ndotwi / pdf)
+        return L
 
 
 class Phong(Material):
@@ -140,6 +144,8 @@ class Emissive(Material):
             return Color(0.0, 0.0, 0.0)
 
     def path_shade(self, shading_point):
+        if shading_point.ray_depth == 1:
+            return Color(0.0, 0.0, 0.0)
         wo = shading_point.ray.direction * -1.0
         wo = wo.normalize()  
         if shading_point.normal * wo > 0.0:
