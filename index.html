@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PyTracer by hanton</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">PyTracer</h1>
+        <p class="header">Ray Tracer in Python</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/hanton/pyTracer/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/hanton/pyTracer/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/hanton/pyTracer">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/hanton">hanton</a></p>
+
+
+      </header>
+      <section>
+        <h2>
+<a name="pytracer---a-ray-tracer-in-python" class="anchor" href="#pytracer---a-ray-tracer-in-python"><span class="octicon octicon-link"></span></a>pyTracer - a Ray Tracer in Python</h2>
+
+<h4>
+<a name="vision---physics-radiometry---mathematical-model---python---screen-pixels" class="anchor" href="#vision---physics-radiometry---mathematical-model---python---screen-pixels"><span class="octicon octicon-link"></span></a>Vision -&gt; Physics (radiometry) -&gt; Mathematical Model -&gt; Python -&gt; Screen Pixels</h4>
+
+<h2>
+<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+
+<h5>
+<a name="-camera--pinhole-camera" class="anchor" href="#-camera--pinhole-camera"><span class="octicon octicon-link"></span></a>* Camera : <code>Pinhole Camera</code>
+</h5>
+
+<h5>
+<a name="-sampler-multijittered-sampler-regular-sampler" class="anchor" href="#-sampler-multijittered-sampler-regular-sampler"><span class="octicon octicon-link"></span></a>* Sampler: <code>Multijittered Sampler</code>, <code>Regular Sampler</code>
+</h5>
+
+<h5>
+<a name="-texture-image-texture" class="anchor" href="#-texture-image-texture"><span class="octicon octicon-link"></span></a>* Texture: <code>Image Texture</code>
+</h5>
+
+<h5>
+<a name="-brdf-diffuse-glossy-specular-mirror-specular" class="anchor" href="#-brdf-diffuse-glossy-specular-mirror-specular"><span class="octicon octicon-link"></span></a>* BRDF: <code>Diffuse</code>, <code>Glossy Specular</code>, <code>Mirror Specular</code>
+</h5>
+
+<h5>
+<a name="-light-ambient-light-point-light-direction-light--area-light" class="anchor" href="#-light-ambient-light-point-light-direction-light--area-light"><span class="octicon octicon-link"></span></a>* Light: <code>Ambient Light</code>, <code>Point Light</code>, <code>Direction Light</code>,  <code>Area Light</code>
+</h5>
+
+<h5>
+<a name="-ambient-occlusion" class="anchor" href="#-ambient-occlusion"><span class="octicon octicon-link"></span></a>* <code>Ambient Occlusion</code>
+</h5>
+
+<h5>
+<a name="-shadow" class="anchor" href="#-shadow"><span class="octicon octicon-link"></span></a>* <code>Shadow</code>
+</h5>
+
+<h5>
+<a name="-geometry-sphere-plane-rectangle" class="anchor" href="#-geometry-sphere-plane-rectangle"><span class="octicon octicon-link"></span></a>* Geometry: <code>Sphere</code>, <code>Plane</code>, <code>Rectangle</code>
+</h5>
+
+<h5>
+<a name="-tone-mapping-ward-contrast-based-linear-scale-reinhard-spatially-varying-nonlinear-scale" class="anchor" href="#-tone-mapping-ward-contrast-based-linear-scale-reinhard-spatially-varying-nonlinear-scale"><span class="octicon octicon-link"></span></a>* Tone Mapping: <code>Ward Contrast-based Linear Scale</code>, <code>Reinhard Spatially Varying Nonlinear Scale</code>
+</h5>
+
+<h2>
+<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h2>
+
+<h4>
+<a name="direction-illumination" class="anchor" href="#direction-illumination"><span class="octicon octicon-link"></span></a>Direction Illumination</h4>
+
+<p><img src="https://github.com/hanton/pypyRayTracer/blob/master/Render/Direction%20Illumination.png?raw=true" alt=""></p>
+
+<h4>
+<a name="ambient-occlusion" class="anchor" href="#ambient-occlusion"><span class="octicon octicon-link"></span></a>Ambient Occlusion</h4>
+
+<p><img src="https://github.com/hanton/pypyRayTracer/blob/master/Render/Ambient%20Occlusion.png?raw=true" alt=""></p>
+
+<h4>
+<a name="area-light-without-tone-mapping" class="anchor" href="#area-light-without-tone-mapping"><span class="octicon octicon-link"></span></a>Area Light without Tone Mapping</h4>
+
+<p><img src="https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light%20without%20Tone%20Mapping.png?raw=true" alt=""></p>
+
+<h4>
+<a name="area-light-with-tone-mapping" class="anchor" href="#area-light-with-tone-mapping"><span class="octicon octicon-link"></span></a>Area Light with Tone Mapping</h4>
+
+<p>( Erik Reinhard, Mike Stark, Peter Shirley and Jim Ferwerda, 'Photographic Tone Reproduction for Digital Images', ACM Transactions on Graphics, 21(3), pp 267--276, July 2002 (Proceedings of SIGGRAPH 2002).)
+<img src="https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light.png?raw=true" alt=""></p>
+
+<h4>
+<a name="area-light-with-blooming-effect-and-tone-mapping" class="anchor" href="#area-light-with-blooming-effect-and-tone-mapping"><span class="octicon octicon-link"></span></a>Area Light with Blooming Effect and Tone Mapping</h4>
+
+<p>(K. Chiu, M. Herf, P. Shirley, S. Swamy, C. Wang, and K. Zimmerman. Spatially nonuniform scaling functions for high contrast images. In Proceedings of Graphics Interface '93, pages 245--253, 1993.)
+<img src="https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light%20with%20Blooming%20Effect.png?raw=true" alt=""></p>
+
+<h2>
+<a name="how-to-run" class="anchor" href="#how-to-run"><span class="octicon octicon-link"></span></a>How to Run</h2>
+
+<h5>
+<a name="pypy-pytracer---to-render-a-default-740740-with-1-pixel-samples-picture" class="anchor" href="#pypy-pytracer---to-render-a-default-740740-with-1-pixel-samples-picture"><span class="octicon octicon-link"></span></a><code>pypy pyTracer</code> - to render a default 740*740 with 1 pixel samples picture</h5>
+
+<p>or </p>
+
+<h5>
+<a name="pypy-pytracer-width-height-pixel_samples---to-render-a-widthheight-with-number-pixel-samples-picture" class="anchor" href="#pypy-pytracer-width-height-pixel_samples---to-render-a-widthheight-with-number-pixel-samples-picture"><span class="octicon octicon-link"></span></a><code>pypy pyTracer width height pixel_samples</code> - to render a width*height with number pixel samples picture</h5>
+
+<p>If you have not installed PyPy, Python is still OK, but a lot slower...</p>
+
+<h5>
+<a name="python-pytracer---to-render-a-default-740740-with-1-pixel-samples-picture" class="anchor" href="#python-pytracer---to-render-a-default-740740-with-1-pixel-samples-picture"><span class="octicon octicon-link"></span></a><code>python pyTracer</code> - to render a default 740*740 with 1 pixel samples picture</h5>
+
+<p>or </p>
+
+<h5>
+<a name="python-pytracer-width-height-pixel_samples---to-render-a-widthheight-with-number-pixel-samples-picture" class="anchor" href="#python-pytracer-width-height-pixel_samples---to-render-a-widthheight-with-number-pixel-samples-picture"><span class="octicon octicon-link"></span></a><code>python pyTracer width height pixel_samples</code> - to render a width*height with number pixel samples picture</h5>
+
+<h2>
+<a name="reference" class="anchor" href="#reference"><span class="octicon octicon-link"></span></a>Reference:</h2>
+
+<ul>
+<li>Ray Tracing from the Ground Up by Kevin Suffern</li>
+<li>Physically Based Rendering: From Theory To Implementation by Matt Pharr, Greg Humphreys</li>
+<li>Advanced Global Illumination by Philip Dutre, Philippe Bekaert and Kavita Bala</li>
+<li>Mitsuba Renderer : <a href="http://www.mitsuba-renderer.org">http://www.mitsuba-renderer.org</a>
+</li>
+<li>LuxRender : <a href="http://www.luxrender.net">http://www.luxrender.net</a>
+</li>
+</ul><p>GitHub: <a href="https://github.com/hanton/pyTracer">https://github.com/hanton/pyTracer</a></p>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="https://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
