@@ -28,14 +28,14 @@
 ![](https://github.com/hanton/pypyRayTracer/blob/master/Render/Area%20Light with Blooming Effect.png?raw=true)
 
 ##How to Run
-#####`pypy pyRayTracer` - to render a default 740*740 with 1 pixel samples picture
+#####`pypy pyTracer` - to render a default 740*740 with 1 pixel samples picture
 or 
-#####`pypy pyRayTracer width height pixel_samples` - to render a width*height with number pixel samples picture
+#####`pypy pyTracer width height pixel_samples` - to render a width*height with number pixel samples picture
 #####
 If you have not installed PyPy, Python is still OK, but a lot slower...
-#####`python pyRayTracer` - to render a default 740*740 with 1 pixel samples picture
+#####`python pyTracer` - to render a default 740*740 with 1 pixel samples picture
 or 
-#####`python pyRayTracer width height pixel_samples` - to render a width*height with number pixel samples picture
+#####`python pyTracer width height pixel_samples` - to render a width*height with number pixel samples picture
 
 ##Reference: 
 * Ray Tracing from the Ground Up by Kevin Suffern
